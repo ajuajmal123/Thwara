@@ -9,7 +9,7 @@ export default function ContributorsIndex() {
             {/* Header section */}
             <section className="bg-neutral-50 border-b-[0.5px] border-[var(--color-brand-border)] p-8 sm:p-12 lg:p-24 pt-16 lg:pt-24 flex flex-col md:flex-row justify-between w-full">
                 <div className="max-w-2xl">
-                    <h1 className="font-serif text-[4rem] sm:text-[6rem] lg:text-[8rem] font-medium leading-[0.8] tracking-tighter text-[var(--color-brand-black)] uppercase break-words w-full">
+                    <h1 className="font-serif text-[clamp(2.5rem,10vw,8rem)] font-medium leading-[0.8] tracking-tighter text-[var(--color-brand-black)] uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full">
                         <span className="text-[var(--color-brand-red)]">Con</span>tributors
                     </h1>
                     <p className="mt-8 text-[15px] text-[var(--color-brand-gray)] max-w-md leading-relaxed selection:bg-[var(--color-brand-red)] selection:text-white">
