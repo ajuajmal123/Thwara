@@ -1,14 +1,21 @@
+import Image from "next/image";
+
 export default function Hero() {
     return (
         <section className="relative min-h-[90vh] flex flex-col md:flex-row px-4 sm:px-8 border-b-[0.5px] border-[var(--color-brand-border)] overflow-hidden">
 
-            {/* Left Column: Massive Editorial Typography */}
+            {/* Left Column: Image */}
             <div className="flex flex-col justify-center w-full md:w-[65%] lg:w-[70%] pt-24 pb-16 md:pr-12 md:border-r-[0.5px] border-[var(--color-brand-border)]">
-                <h1 className="font-serif text-[14vw] sm:text-[12vw] lg:text-[10rem] font-medium leading-[0.85] tracking-tighter text-[var(--color-brand-black)] uppercase break-words w-full overflow-hidden">
-                    <span className="block translate-y-0 animate-[fadeSlideUp_1s_ease-out]">Think.</span>
-                    <span className="block text-[var(--color-brand-red)] translate-y-0 animate-[fadeSlideUp_1s_ease-out_100ms_both]">Write.</span>
-                    <span className="block translate-y-0 animate-[fadeSlideUp_1s_ease-out_200ms_both]">Reimagine.</span>
-                </h1>
+                <div className="relative w-full aspect-[4/3] md:h-[70vh] overflow-hidden rounded-sm animate-[fadeIn_1s_ease-out]">
+                    <Image
+                        src="/WhatsApp Image 2026-08-31 at 7.58.15 PM.jpeg"
+                        alt="Thwara Editorial"
+                        fill
+                        className="object-cover"
+                        priority
+                        sizes="(max-width: 768px) 100vw, 70vw"
+                    />
+                </div>
             </div>
 
             {/* Right Column: Rigid Supporting Structure */}

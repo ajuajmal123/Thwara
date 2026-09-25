@@ -1,14 +1,19 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #F8F7F3;
-  --color-foreground: #111111;
+  --color-background: #FFFFFF;
+  --color-foreground: #000000;
 
-  --color-brand-red: #C91F26;
-  --color-brand-black: #111111;
+  --color-brand-red: #FF0000;
+  --color-brand-black: #000000;
   --color-brand-white: #FFFFFF;
+  --color-brand-green: #90EE90;
+  /* Light Green */
+  --color-brand-darkgreen: #008000;
+  /* For Green underlines */
   --color-brand-gray: #777777;
-  --color-brand-border: #E5E5E5;
+  --color-brand-border: #90EE90;
+  /* Light green outline */
 
   --font-sans: var(--font-inter), var(--font-noto-malayalam), sans-serif;
   --font-serif: var(--font-lora), var(--font-noto-malayalam), serif;
@@ -29,4 +34,27 @@ body {
 ::selection {
   background-color: var(--color-brand-red);
   color: var(--color-brand-white);
+}
+
+@keyframes scrollx {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scrollx {
+  animation: scrollx 20s linear infinite;
+}
+
+.animate-scrollx:hover {
+  animation-play-state: paused;
+}
+
+.mask-edges {
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }

@@ -1,93 +1,97 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const FOOTER_LINKS = [
+const COL1_LINKS = [
     { label: "About", href: "/about" },
-    { label: "Essays", href: "/essays" },
-    { label: "Creative", href: "/creative" },
+    { label: "Team", href: "/team" },
+    { label: "Article", href: "/articles" },
+    { label: "Folklore", href: "/folklore" },
+    { label: "Fiction", href: "/fiction" },
     { label: "Webzine", href: "/webzine" },
-    { label: "Contributors", href: "/contributors" },
-    { label: "Archive", href: "/archive" },
+];
+
+const COL2_LINKS = [
+    { label: "Submissions", href: "/submissions" },
+    { label: "Guidelines", href: "/guidelines" },
+    { label: "Privacy and Policy", href: "/privacy-policy.pdf" },
+    { label: "Contact", href: "/contact" },
 ];
 
 export default function Footer() {
     return (
-        <footer className="bg-[var(--color-background)] w-full">
-            <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-1 border-b-[0.5px] border-[var(--color-brand-border)]">
+        <footer className="bg-white w-full border-t-4 border-[var(--color-brand-border)] p-4">
+            <div className="max-w-[1400px] mx-auto border-4 border-[var(--color-brand-border)] rounded-md p-6 sm:p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-8">
 
-                {/* Brand Block */}
-                <div className="md:col-span-1 border-b-[0.5px] md:border-b-0 md:border-r-[0.5px] border-[var(--color-brand-border)] p-8 sm:p-10 flex flex-col bg-neutral-50/40">
-                    <Link href="/" className="inline-block outline-none mb-16">
-                        <Image
-                            src="/image.png"
-                            alt="THWARA Logo"
-                            width={100}
-                            height={30}
-                            className="h-6 w-auto object-contain grayscale opacity-60 hover:opacity-100 transition-opacity"
-                        />
-                    </Link>
-                    <p className="mt-auto max-w-[200px] text-[11px] leading-relaxed text-[var(--color-brand-gray)] font-medium">
-                        An independent bilingual digital media collective.
-                    </p>
-                </div>
-
-                {/* Directory Links */}
-                <div className="md:col-span-1 border-b-[0.5px] md:border-b-0 md:border-r-[0.5px] border-[var(--color-brand-border)] p-8 sm:p-10 flex flex-col">
-                    <h3 className="mb-10 text-[9px] font-semibold tracking-[0.25em] text-[var(--color-brand-black)] uppercase">Directory</h3>
-                    <ul className="flex flex-col gap-5 mt-auto">
-                        {FOOTER_LINKS.map((link) => (
-                            <li key={link.label}>
-                                <Link
-                                    href={link.href}
-                                    className="text-[13px] font-medium tracking-wide text-[var(--color-brand-gray)] hover:text-[var(--color-brand-black)] hover:ml-1 transition-all duration-300"
-                                >
-                                    {link.label}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Connect */}
-                <div className="md:col-span-1 border-b-[0.5px] md:border-b-0 md:border-r-[0.5px] border-[var(--color-brand-border)] p-8 sm:p-10 flex flex-col">
-                    <h3 className="mb-10 text-[9px] font-semibold tracking-[0.25em] text-[var(--color-brand-black)] uppercase">Connect</h3>
-                    <ul className="flex flex-col gap-5 mt-auto">
-                        <li>
-                            <a href="#" className="text-[12px] font-medium uppercase tracking-[0.1em] text-[var(--color-brand-gray)] hover:text-[var(--color-brand-black)] hover:italic transition-all duration-300">
-                                Instagram
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" className="text-[12px] font-medium uppercase tracking-[0.1em] text-[var(--color-brand-gray)] hover:text-[var(--color-brand-black)] hover:italic transition-all duration-300">
-                                Twitter / X
-                            </a>
-                        </li>
-                        <li>
-                            <a href="mailto:hello@thwara.com" className="text-[12px] font-medium tracking-wide text-[var(--color-foreground)] border-b-[0.5px] border-[var(--color-brand-gray)] pb-[2px] hover:text-[var(--color-brand-red)] hover:border-transparent transition-all duration-300 mt-4 inline-block">
-                                hello@thwara.com
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                {/* Language State */}
-                <div className="md:col-span-1 p-8 sm:p-10 flex flex-col items-start md:items-end justify-between bg-neutral-50/40">
-                    <h3 className="mb-10 text-[9px] font-semibold tracking-[0.25em] text-[var(--color-brand-black)] uppercase w-full md:text-right">Lang</h3>
-                    <div className="flex flex-row md:flex-col md:items-end gap-3 text-[11px] font-semibold tracking-[0.15em] text-[var(--color-brand-gray)] w-full">
-                        <button className="text-[var(--color-foreground)] md:w-full md:text-right">English</button>
-                        <span className="hidden md:block w-[0.5px] h-4 bg-[var(--color-brand-border)]" />
-                        <button className="hover:text-[var(--color-foreground)] transition-colors md:w-full md:text-right font-sans">മലയാളം</button>
+                    {/* Brand Info & Logos */}
+                    <div className="flex flex-col gap-4">
+                        <Link href="/" className="inline-block outline-none">
+                            <Image
+                                src="/image.png"
+                                alt="THWARA Logo"
+                                width={120}
+                                height={40}
+                                className="h-8 w-auto object-contain"
+                            />
+                        </Link>
+                        <p className="text-sm font-bold text-black max-w-[250px]">
+                            Think, Write, Re-imagined.
+                        </p>
                     </div>
-                </div>
 
+                    {/* Column 1 Links */}
+                    <div className="flex flex-col gap-4">
+                        <h3 className="text-lg font-bold text-black uppercase underline decoration-[var(--color-brand-red)] underline-offset-4">Explore</h3>
+                        <ul className="flex flex-col gap-2 mt-2">
+                            {COL1_LINKS.map((link) => (
+                                <li key={link.label}>
+                                    <Link
+                                        href={link.href}
+                                        className="text-sm font-bold text-black hover:text-[var(--color-brand-red)] transition-colors flex items-center gap-2 group"
+                                    >
+                                        <span className="text-[var(--color-brand-red)] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Column 2 Links */}
+                    <div className="flex flex-col gap-4">
+                        <h3 className="text-lg font-bold text-black uppercase underline decoration-[var(--color-brand-green)] underline-offset-4">Information</h3>
+                        <ul className="flex flex-col gap-2 mt-2">
+                            {COL2_LINKS.map((link) => (
+                                <li key={link.label}>
+                                    <Link
+                                        href={link.href}
+                                        className="text-sm font-bold text-black hover:text-[var(--color-brand-red)] transition-colors flex items-center gap-2 group"
+                                    >
+                                        <span className="text-[var(--color-brand-red)] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Connect & Region */}
+                    <div className="flex flex-col gap-6">
+                        <h3 className="text-lg font-bold text-black uppercase">Follow Us</h3>
+                        <div className="flex gap-4 flex-wrap">
+                            {["X/Twitter", "Facebook", "Instagram", "YouTube", "LinkedIn"].map((platform) => (
+                                <a key={platform} href="#" className="w-8 h-8 rounded-full border-2 border-[var(--color-brand-border)] flex items-center justify-center text-[var(--color-brand-red)] hover:bg-[var(--color-brand-red)] hover:text-white transition-colors" title={platform}>
+                                    <span className="text-xs font-bold">{platform[0]}</span>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between px-8 sm:px-10 py-6 text-[9px] uppercase tracking-[0.25em] text-[var(--color-brand-gray)] font-semibold">
-                <p>© {new Date().getFullYear()} THWARA. ALL RIGHTS RESERVED.</p>
-                <div className="mt-4 sm:mt-0 flex gap-6">
-                    <Link href="#" className="hover:text-[var(--color-brand-black)] transition-colors">Privacy</Link>
-                    <Link href="#" className="hover:text-[var(--color-brand-black)] transition-colors">Terms</Link>
-                </div>
+            <div className="max-w-[1400px] mx-auto mt-4 text-center">
+                <p className="text-xs font-bold text-black">© {new Date().getFullYear()} THWARA. ALL RIGHTS RESERVED.</p>
             </div>
         </footer>
     );
