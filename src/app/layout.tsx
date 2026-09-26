@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Lora, Noto_Sans_Malayalam } from "next/font/google";
+import { Libre_Bodoni, Noto_Sans_Malayalam } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const lora = Lora({
-  variable: "--font-lora",
+const libreBodoni = Libre_Bodoni({
+  variable: "--font-libre-bodoni",
   subsets: ["latin"],
 });
 
@@ -32,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${lora.variable} ${malayalam.variable} antialiased`}
+      className={`${libreBodoni.variable} ${malayalam.variable} antialiased`}
     >
       <body className="min-h-screen flex flex-col pt-0">
         <Header />

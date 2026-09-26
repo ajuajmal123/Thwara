@@ -35,7 +35,7 @@ export default function Footer() {
                             />
                         </Link>
                         <p className="text-sm font-bold text-black max-w-[250px]">
-                            Think, Write, Re-imagined.
+                            Think, Write, Reimagine all.
                         </p>
                     </div>
 
@@ -59,7 +59,7 @@ export default function Footer() {
 
                     {/* Column 2 Links */}
                     <div className="flex flex-col gap-4">
-                        <h3 className="text-lg font-bold text-black uppercase underline decoration-[var(--color-brand-green)] underline-offset-4">Information</h3>
+                        <h3 className="text-lg font-bold text-black uppercase underline decoration-[var(--color-brand-red)] underline-offset-4">Information</h3>
                         <ul className="flex flex-col gap-2 mt-2">
                             {COL2_LINKS.map((link) => (
                                 <li key={link.label}>

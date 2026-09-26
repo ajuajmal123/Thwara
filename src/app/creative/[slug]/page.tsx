@@ -104,7 +104,7 @@ export default async function CreativeDetail({ params }: { params: Promise<{ slu
                         <p>
                             {isMalayalam
                                 ? "നമ്മൾ എപ്പോഴും സംസാരിക്കുന്നത് ഭാവിയിലേക്കാണ്. എന്നാൽ യഥാർത്ഥത്തിൽ നമ്മൾ ജീവിക്കുന്നത് കഴിഞ്ഞ കാലത്തിന്റെ ഓർമ്മകളിലാണ്. ഓരോ നിമിഷവും ഒരു പഴയ ഫ്രെയിം പോലെ പിന്നിലേക്ക് മറയുന്നു."
-                                : "She stood near the kitchen counter. The silence was geometric—sharp edges, rigid coordinates, trapping us in a space where words lost their buoyancy and plummeted directly to the cracked linoleum floor."}
+                                : "She stood near the kitchen counter. The silence was geometric-sharp edges, rigid coordinates, trapping us in a space where words lost their buoyancy and plummeted directly to the cracked linoleum floor."}
                         </p>
                     </article>
                 )}

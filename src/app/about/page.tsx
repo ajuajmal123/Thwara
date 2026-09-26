@@ -14,7 +14,7 @@ export default function AboutPage() {
                     </p>
 
                     <p className="text-black text-lg md:text-xl leading-relaxed font-medium">
-                        The Malayalam word ത്വര (Thwara) means an urge—to explore, to act, to create. We come together with that same urge: to think, write, and reimagine the world with curiosity and critical care.
+                        The Malayalam word ത്വര (Thwara) means an urge-to explore, to act, to create. We come together with that same urge: to think, write, and reimagine the world with curiosity and critical care.
                     </p>
 
                     <p className="text-black text-lg md:text-xl leading-relaxed font-medium">
@@ -23,7 +23,7 @@ export default function AboutPage() {
                     </p>
 
                     <p className="text-black text-lg md:text-xl leading-relaxed font-medium">
-                        THWARA supports emerging writers and researchers and fosters conversations across disciplines and forms. We aim to make knowledge more accessible, local, and democratic—and to grow from a publishing platform into a living community rooted in dialogue, curiosity, and critical thought.
+                        THWARA supports emerging writers and researchers and foster conversations across disciplines and forms. We aim to make knowledge more accessible, local, and democratic-and to grow from a publishing platform into a living community rooted in dialogue, curiosity, and critical thought.
                     </p>
                 </div>
 

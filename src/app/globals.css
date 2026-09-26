@@ -4,19 +4,19 @@
   --color-background: #FFFFFF;
   --color-foreground: #000000;
 
-  --color-brand-red: #FF0000;
+  --color-brand-red: #6B1313;
   --color-brand-black: #000000;
   --color-brand-white: #FFFFFF;
-  --color-brand-green: #90EE90;
+  --color-brand-green: #0F3A20;
   /* Light Green */
-  --color-brand-darkgreen: #008000;
+  --color-brand-darkgreen: #0F3A20;
   /* For Green underlines */
   --color-brand-gray: #777777;
-  --color-brand-border: #90EE90;
+  --color-brand-border: #0F3A20;
   /* Light green outline */
 
-  --font-sans: var(--font-inter), var(--font-noto-malayalam), sans-serif;
-  --font-serif: var(--font-lora), var(--font-noto-malayalam), serif;
+  --font-sans: var(--font-libre-bodoni), var(--font-noto-malayalam), sans-serif;
+  --font-serif: var(--font-libre-bodoni), var(--font-noto-malayalam), serif;
 }
 
 /* Base resets & styles */

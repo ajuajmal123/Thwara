@@ -26,7 +26,7 @@ export default function SubmissionsPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">Pick your language —</span>
+                                <span className="font-bold text-black text-xl mr-2">Pick your language -</span>
                                 <span className="text-black text-lg font-medium leading-relaxed">
                                     English or Malayalam.
                                 </span>
@@ -38,7 +38,7 @@ export default function SubmissionsPage() {
                             <div>
                                 <span className="font-bold text-black text-xl mr-2">How long?</span>
                                 <span className="text-black text-lg font-medium leading-relaxed">
-                                    500–1,600 words. Short, sharp, and substantial.
+                                    500-1,600 words. Short, sharp, and substantial.
                                 </span>
                             </div>
                         </li>

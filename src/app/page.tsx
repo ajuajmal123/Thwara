@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
@@ -16,9 +17,13 @@ export default function Home() {
   if (showSplash) {
     return (
       <div className="fixed inset-0 bg-white z-[100] flex items-center justify-center transition-opacity duration-1000">
-        <h1 className="text-4xl md:text-6xl font-bold text-black tracking-widest text-center px-4 animate-pulse">
-          Think, Write, Re-imagined
-        </h1>
+        <Image
+          src="/image.png"
+          alt="THWARA Logo"
+          width={400}
+          height={150}
+          className="animate-pulse w-auto h-16 md:h-24"
+        />
       </div>
     );
   }

@@ -34,7 +34,7 @@ export default function AboutPreview() {
                         </p>
                         <div className="flex flex-col justify-between items-start pt-2">
                             <p className="text-[14px] sm:text-[15px] text-neutral-400 leading-[1.8] max-w-[320px] mb-12">
-                                From these situated places we engage knowledge, culture, and society—and make space for other ways of seeing and knowing.
+                                From these situated places we engage knowledge, culture, and society-and make space for other ways of seeing and knowing.
                             </p>
 
                             <Link href="/about" className="inline-flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-white hover:text-[var(--color-brand-red)] transition-all group">
