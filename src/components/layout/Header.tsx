@@ -11,6 +11,7 @@ const NAV_LINKS = [
     { label: "Fiction", href: "/fiction" },
     { label: "Folklore", href: "/folklore" },
     { label: "Webzine", href: "/webzine" },
+    { label: "Tellings", href: "/tellings" },
     { label: "Authors", href: "/authors" },
     { label: "Submissions", href: "/submissions" },
     { label: "Contact", href: "/contact" },

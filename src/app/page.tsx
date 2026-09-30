@@ -20,25 +20,25 @@ export default function Home() {
         <Image
           src="/image.png"
           alt="THWARA Logo"
-          width={600}
-          height={225}
-          className="animate-pulse w-auto h-24 md:h-32"
+          width={160}
+          height={135}
+          className="animate-pulse w-[160px] h-[135px] md:w-auto md:h-32 object-contain"
         />
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 py-6 flex flex-col gap-8">
+    <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 py-4 sm:py-6 flex flex-col gap-4 sm:gap-8">
 
       {/* 3.5 Client Quote Section */}
-      <section className="border-4 border-[var(--color-brand-border)] p-8 md:p-12 rounded-lg bg-white flex flex-col">
-        <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
-          <span className="text-[var(--color-brand-red)] text-6xl font-serif leading-none h-4 text-left">“</span>
-          <h2 className="text-xl md:text-3xl font-bold text-black italic leading-relaxed text-justify px-4">
+      <section className="border-4 border-[var(--color-brand-border)] p-4 sm:p-8 md:p-12 rounded-lg bg-white flex flex-col">
+        <div className="flex flex-col gap-2 sm:gap-4 max-w-3xl mx-auto w-full">
+          <span className="text-[var(--color-brand-red)] text-4xl sm:text-6xl font-serif leading-none h-2 sm:h-4 text-left">“</span>
+          <h2 className="text-[13px] sm:text-base md:text-2xl lg:text-3xl font-bold text-black italic leading-normal sm:leading-relaxed text-justify px-1 sm:px-2 md:px-4">
             We never read with our eyes alone. We read through the social, cultural, and historical lenses we carry.
           </h2>
-          <span className="text-[var(--color-brand-red)] text-6xl font-serif leading-none h-4 text-right">”</span>
+          <span className="text-[var(--color-brand-red)] text-4xl sm:text-6xl font-serif leading-none h-2 sm:h-4 text-right mt-2 sm:mt-0">”</span>
         </div>
       </section>
 
@@ -67,7 +67,7 @@ export default function Home() {
       </section>
 
       {/* 5. Articles Section */}
-      <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-4 bg-white flex flex-col gap-4">
+      <section className="border-4 border-[var(--color-brand-border)] p-3 sm:p-4 rounded-lg bg-white flex flex-col gap-3 sm:gap-4">
         <h2 className="text-2xl font-bold text-black underline decoration-[var(--color-brand-green)] underline-offset-8">Articles</h2>
         <div className="flex flex-col gap-4">
           {[1, 2, 3].map((item) => (
@@ -90,7 +90,7 @@ export default function Home() {
       </section>
 
       {/* 6. Webzine Section */}
-      <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-6 bg-white flex flex-col gap-6">
+      <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-4 sm:p-6 bg-white flex flex-col gap-4 sm:gap-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold text-black underline decoration-[var(--color-brand-red)] underline-offset-8">Webzine</h2>
           <Link href="/webzine" className="text-[var(--color-brand-red)] font-bold text-sm flex items-center gap-1">View All <span>→</span></Link>
@@ -109,7 +109,7 @@ export default function Home() {
       </section>
 
       {/* 7. Fictions Section */}
-      <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-4 bg-white flex flex-col gap-4">
+      <section className="border-4 border-[var(--color-brand-border)] p-3 sm:p-4 rounded-lg bg-white flex flex-col gap-3 sm:gap-4">
         <h2 className="text-2xl font-bold text-black underline decoration-[var(--color-brand-green)] underline-offset-8">Fictions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((item) => (
@@ -128,7 +128,7 @@ export default function Home() {
       </section>
 
       {/* 8. Folklore Section (Matches Articles Style) */}
-      <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-4 bg-white flex flex-col gap-4">
+      <section className="border-4 border-[var(--color-brand-border)] p-3 sm:p-4 rounded-lg bg-white flex flex-col gap-3 sm:gap-4">
         <h2 className="text-2xl font-bold text-black underline decoration-[var(--color-brand-red)] underline-offset-8">Folklore</h2>
         <div className="flex flex-col gap-4">
           {[
@@ -168,8 +168,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 9. Newsletter Section */}
-      <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-8 bg-white flex flex-col items-center gap-6 justify-center">
+
+
+      {/* 10. Newsletter Section */}
+      <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-5 sm:p-8 bg-white flex flex-col items-center gap-4 sm:gap-6 justify-center">
         <h2 className="text-3xl font-bold text-black underline decoration-[var(--color-brand-green)] underline-offset-8">Join Our Newsletter</h2>
 
         <form className="w-full max-w-lg flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>

@@ -6,8 +6,8 @@ export default function GuidelinesPage() {
 
             <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-6 sm:p-10 bg-white flex flex-col">
 
-                <div className="max-w-4xl w-full mx-auto flex flex-col gap-6 text-left">
-                    <h1 className="text-3xl md:text-5xl font-bold text-black text-left underline decoration-[var(--color-brand-red)] underline-offset-8">
+                <div className="max-w-4xl w-full mx-auto flex flex-col gap-6 text-justify">
+                    <h1 className="text-[17px] sm:text-3xl md:text-5xl font-bold text-black text-left underline decoration-[var(--color-brand-red)] underline-offset-4 sm:underline-offset-8 whitespace-nowrap overflow-hidden text-ellipsis sm:whitespace-normal">
                         Got a Thwara? A few things first!
                     </h1>
 
@@ -16,8 +16,8 @@ export default function GuidelinesPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">What’s welcome at Thwara?</span>
-                                <span className="text-black text-lg font-medium leading-relaxed">
+                                <span className="font-bold text-black text-base sm:text-lg md:text-xl mr-2">What’s welcome at Thwara?</span>
+                                <span className="text-black text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                                     Articles, essays, short stories, poetry, reviews, and social, political, cultural, and literary commentary.
                                 </span>
                             </div>
@@ -26,8 +26,8 @@ export default function GuidelinesPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">Pick your language -</span>
-                                <span className="text-black text-lg font-medium leading-relaxed">
+                                <span className="font-bold text-black text-base sm:text-lg md:text-xl mr-2">Pick your language -</span>
+                                <span className="text-black text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                                     English or Malayalam.
                                 </span>
                             </div>
@@ -36,8 +36,8 @@ export default function GuidelinesPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">How long?</span>
-                                <span className="text-black text-lg font-medium leading-relaxed">
+                                <span className="font-bold text-black text-base sm:text-lg md:text-xl mr-2">How long?</span>
+                                <span className="text-black text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                                     500-1,600 words. Short, sharp, and substantial.
                                 </span>
                             </div>
@@ -46,8 +46,8 @@ export default function GuidelinesPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">No copy-paste!</span>
-                                <span className="text-black text-lg font-medium leading-relaxed">
+                                <span className="font-bold text-black text-base sm:text-lg md:text-xl mr-2">No copy-paste!</span>
+                                <span className="text-black text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                                     We want original work. Plagiarised, copied, or third-party content won’t make the cut. Use AI as a thinking partner, not a ghostwriter. Research and ideation are fine; the work you submit should be your own.
                                 </span>
                             </div>
@@ -56,8 +56,8 @@ export default function GuidelinesPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">Keep it fresh.</span>
-                                <span className="text-black text-lg font-medium leading-relaxed">
+                                <span className="font-bold text-black text-base sm:text-lg md:text-xl mr-2">Keep it fresh.</span>
+                                <span className="text-black text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                                     We accept work that hasn’t been published elsewhere.
                                 </span>
                             </div>
@@ -66,8 +66,8 @@ export default function GuidelinesPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">Got a story that lives in memory?</span>
-                                <span className="text-black text-lg font-medium leading-relaxed">
+                                <span className="font-bold text-black text-base sm:text-lg md:text-xl mr-2">Got a story that lives in memory?</span>
+                                <span className="text-black text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                                     Bring it to us. Oral histories, folklore, myths, legends, and community narratives that have been passed down through generations but remain unwritten or undocumented are especially welcome and may receive special consideration.
                                 </span>
                             </div>
@@ -76,8 +76,8 @@ export default function GuidelinesPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">Words and Visuals, we love that!</span>
-                                <span className="text-black text-lg font-medium leading-relaxed">
+                                <span className="font-bold text-black text-base sm:text-lg md:text-xl mr-2">Words and Visuals, we love that!</span>
+                                <span className="text-black text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                                     Original artwork and illustrations that complement your work are welcome. Don’t have one? Our editorial team can help.
                                 </span>
                             </div>
@@ -86,8 +86,8 @@ export default function GuidelinesPage() {
                         <li className="flex gap-4 items-start">
                             <span className="text-[var(--color-brand-red)] text-2xl font-bold mt-1">▸</span>
                             <div>
-                                <span className="font-bold text-black text-xl mr-2">Ready to send your thwara our way?</span>
-                                <span className="text-black text-lg font-medium leading-relaxed">
+                                <span className="font-bold text-black text-base sm:text-lg md:text-xl mr-2">Ready to send your thwara our way?</span>
+                                <span className="text-black text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                                     Email your work to our official email address, along with your name and the title. Once it lands with us, our editorial team may make light language or structural edits while keeping your voice and intent intact.
                                 </span>
                             </div>

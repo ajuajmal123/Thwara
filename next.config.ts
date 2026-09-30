@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/privacy',
+        destination: '/privacy-policy.pdf',
+        permanent: true,
+      },
+    ]
+  },
 };
 
 export default nextConfig;
