@@ -73,9 +73,9 @@ export default function Header() {
                         <Image
                             src="/image.png"
                             alt="THWARA"
-                            width={120}
-                            height={40}
-                            className="h-8 w-auto object-contain transition-opacity duration-300"
+                            width={160}
+                            height={60}
+                            className="h-12 md:h-14 w-auto object-contain transition-opacity duration-300"
                             priority
                         />
                     </Link>

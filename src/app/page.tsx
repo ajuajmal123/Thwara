@@ -20,9 +20,9 @@ export default function Home() {
         <Image
           src="/image.png"
           alt="THWARA Logo"
-          width={400}
-          height={150}
-          className="animate-pulse w-auto h-16 md:h-24"
+          width={600}
+          height={225}
+          className="animate-pulse w-auto h-24 md:h-32"
         />
       </div>
     );
@@ -32,13 +32,13 @@ export default function Home() {
     <div className="w-full max-w-[1400px] mx-auto px-4 py-6 flex flex-col gap-8">
 
       {/* 3.5 Client Quote Section */}
-      <section className="border-4 border-[var(--color-brand-border)] p-8 md:p-12 rounded-lg bg-white flex flex-col items-center justify-center text-center">
-        <div className="flex flex-col items-center gap-4">
-          <span className="text-[var(--color-brand-red)] text-6xl font-serif leading-none h-8">“</span>
-          <h2 className="text-xl md:text-3xl font-bold text-black max-w-4xl italic leading-relaxed">
-            We believe we never read with our eyes alone. We read through the social, cultural, and historical lenses we carry.
+      <section className="border-4 border-[var(--color-brand-border)] p-8 md:p-12 rounded-lg bg-white flex flex-col">
+        <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
+          <span className="text-[var(--color-brand-red)] text-6xl font-serif leading-none h-4 text-left">“</span>
+          <h2 className="text-xl md:text-3xl font-bold text-black italic leading-relaxed text-justify px-4">
+            We never read with our eyes alone. We read through the social, cultural, and historical lenses we carry.
           </h2>
-          <span className="text-[var(--color-brand-red)] text-6xl font-serif leading-none h-8 rotate-180 mt-2">“</span>
+          <span className="text-[var(--color-brand-red)] text-6xl font-serif leading-none h-4 text-right">”</span>
         </div>
       </section>
 
@@ -131,18 +131,36 @@ export default function Home() {
       <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-4 bg-white flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-black underline decoration-[var(--color-brand-red)] underline-offset-8">Folklore</h2>
         <div className="flex flex-col gap-4">
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="flex flex-col md:flex-row gap-4 border-2 border-[var(--color-brand-border)] rounded p-3 group hover:shadow-md transition-shadow bg-white">
-              <img src={`https://picsum.photos/seed/folklore${item}/400/250`} alt={`Folklore ${item}`} className="md:w-1/4 aspect-video object-cover rounded border-2 border-[var(--color-brand-border)] shrink-0" loading="lazy" />
-              <div className="flex flex-col gap-3 justify-center text-left">
-                <h3 className="text-xl font-bold text-black">Folklore Chronicles: Myth #{item}</h3>
+          {[
+            { id: 1, hasSpotify: true },
+            { id: 2, hasSpotify: false },
+            { id: 3, hasSpotify: true }
+          ].map((item) => (
+            <div key={item.id} className="flex flex-col md:flex-row gap-4 border-2 border-[var(--color-brand-border)] rounded p-3 group hover:shadow-md transition-shadow bg-white">
+              <img src={`https://picsum.photos/seed/folklore${item.id}/400/250`} alt={`Folklore ${item.id}`} className="md:w-1/4 aspect-video object-cover rounded border-2 border-[var(--color-brand-border)] shrink-0" loading="lazy" />
+              <div className="flex flex-col gap-3 justify-center text-left w-full">
+                <h3 className="text-xl font-bold text-black">Folklore Chronicles: Myth #{item.id}</h3>
                 <p className="text-black text-sm leading-relaxed line-clamp-2">
                   Delve into oral histories, myths, and field notes exploring ancient roots and traditional tales passed down through generations.
                 </p>
+                {item.hasSpotify && (
+                  <div className="w-full max-w-md my-1">
+                    <iframe
+                      style={{ borderRadius: '12px' }}
+                      src={`https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0`}
+                      width="100%"
+                      height="152"
+                      frameBorder="0"
+                      allowFullScreen
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                )}
                 <div className="flex items-center gap-3 text-black text-xs">
                   <span className="font-bold">Field Notes</span>
                   <span>|</span>
-                  <span className="text-[var(--color-brand-red)] font-bold cursor-pointer group-hover:underline">Explore →</span>
+                  <Link href="/folklore" className="text-[var(--color-brand-red)] font-bold cursor-pointer group-hover:underline">Explore →</Link>
                 </div>
               </div>
             </div>

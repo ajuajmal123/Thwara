@@ -17,10 +17,10 @@ export default function ContactPage() {
 
                     <div className="flex flex-col gap-2 mt-4 text-black font-bold">
                         <span className="flex items-center gap-3">
-                            <span className="text-[var(--color-brand-red)]">▸</span> hello@thwara.com
+                            <span className="text-[var(--color-brand-red)]">▸</span> thwaracollective@gmail.com
                         </span>
                         <span className="flex items-center gap-3">
-                            <span className="text-[var(--color-brand-red)]">▸</span> Kerala, India. Region: Global
+                            <span className="text-[var(--color-brand-red)]">▸</span> Kerala, India.
                         </span>
                     </div>
                 </div>

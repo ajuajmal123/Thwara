@@ -6,8 +6,8 @@ export default function GuidelinesPage() {
 
             <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-6 sm:p-10 bg-white flex flex-col">
 
-                <div className="max-w-4xl mx-auto flex flex-col gap-6">
-                    <h1 className="text-3xl md:text-5xl font-bold text-black text-center underline decoration-[var(--color-brand-red)] underline-offset-8">
+                <div className="max-w-4xl w-full mx-auto flex flex-col gap-6 text-left">
+                    <h1 className="text-3xl md:text-5xl font-bold text-black text-left underline decoration-[var(--color-brand-red)] underline-offset-8">
                         Got a Thwara? A few things first!
                     </h1>
 

@@ -4,9 +4,9 @@ export default function FictionPage() {
     return (
         <main className="w-full max-w-[1400px] mx-auto px-4 py-8 flex flex-col bg-white">
             <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-6 sm:p-10 bg-white flex flex-col gap-8">
-                
+
                 <div className="flex items-center gap-4 border-b-2 border-[var(--color-brand-border)] pb-4">
-                    <span className="text-[var(--color-brand-red)] text-4xl font-serif">“</span>
+
                     <h1 className="text-3xl md:text-5xl font-bold text-black uppercase">Fiction</h1>
                 </div>
 
