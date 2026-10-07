@@ -3,7 +3,7 @@ export interface Article {
   title: string;
   slug: string;
   language: "English" | "മലയാളം";
-  category: "Essays" | "Research" | "Poetry" | "Social Commentary" | "Personal Narratives" | "Interviews";
+  category: "Essays" | "Research" | "Poetry" | "Social Commentary" | "Personal Narratives" | "Interviews" | "Memoir";
   excerpt: string;
   content: string;
   coverImage: string;

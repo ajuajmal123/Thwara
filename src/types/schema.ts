@@ -4,7 +4,7 @@ export interface Article {
   coverImage: string;
   title: string;
   authorName: string;
-  domain: "Literature" | "Library" | "Psychology" | "History" | "Politics" | "Culture" | "Fashion" | "Photo story" | "Travelogue";
+  domain: "Literature" | "Library" | "Psychology" | "History" | "Politics" | "Culture" | "Fashion" | "Photo story" | "Travelogue" | "Memoir";
   date: string;
   subheading: string;
   additionalImages: string[];

@@ -168,7 +168,47 @@ export default function Home() {
         </div>
       </section>
 
-
+      {/* 9. Tellings Section */}
+      <section className="border-4 border-[var(--color-brand-border)] p-3 sm:p-4 rounded-lg bg-white flex flex-col gap-3 sm:gap-4">
+        <h2 className="text-2xl font-bold text-black underline decoration-[var(--color-brand-red)] underline-offset-8">Tellings</h2>
+        <div className="flex flex-col gap-4">
+          {[
+            { id: 1, type: "Stories" },
+            { id: 2, type: "Podcast" },
+            { id: 3, type: "Interview" }
+          ].map((item) => (
+            <div key={item.id} className="flex flex-col md:flex-row gap-4 border-2 border-[var(--color-brand-border)] rounded p-3 group hover:shadow-md transition-shadow bg-white">
+              <div className="md:w-1/4 aspect-video bg-neutral-100 rounded border-2 border-[var(--color-brand-border)] flex items-center justify-center shrink-0">
+                <span className="text-4xl text-[var(--color-brand-red)]">🎧</span>
+              </div>
+              <div className="flex flex-col gap-3 justify-center text-left w-full">
+                <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-brand-red)]">{item.type}</span>
+                <h3 className="text-xl font-bold text-black">Audio Session #{item.id}</h3>
+                <p className="text-black text-sm leading-relaxed line-clamp-2">
+                  Listen to our latest stories, in-depth podcasts, and intimate interviews directly from our creators.
+                </p>
+                <div className="w-full max-w-md my-1">
+                  <iframe
+                    style={{ borderRadius: '12px' }}
+                    src={`https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0`}
+                    width="100%"
+                    height="80"
+                    frameBorder="0"
+                    allowFullScreen
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                  ></iframe>
+                </div>
+                <div className="flex items-center gap-3 text-black text-xs">
+                  <span className="font-bold">Creator</span>
+                  <span>|</span>
+                  <Link href="/tellings" className="text-[var(--color-brand-red)] font-bold cursor-pointer group-hover:underline">Listen Now →</Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* 10. Newsletter Section */}
       <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-5 sm:p-8 bg-white flex flex-col items-center gap-4 sm:gap-6 justify-center">
