@@ -24,6 +24,7 @@ export interface Folklore {
   narratorDescription: string;
   category: "Oral Histories" | "Folk Practices" | "Folk Literature" | "Myths" | "Legends" | "Field notes";
   reference: string;
+  spotifyUrl?: string; // Add optional Spotify embed URL
 }
 
 export interface Fiction {
@@ -59,6 +60,7 @@ export interface Tellings {
   title: string;
   coverImage?: string;
   category: "Stories" | "Interview" | "Podcast";
+  spotifyUrl?: string; // Add optional Spotify embed URL
   // include other properties as required e.g., audioUrl, date, author
 }
 

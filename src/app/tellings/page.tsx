@@ -35,7 +35,7 @@ export default function TellingsPage() {
             <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-3 sm:p-6 bg-white flex flex-col gap-6">
 
                 {/* Tellings Categories */}
-                <div className="grid grid-cols-3 md:flex md:flex-row md:flex-wrap gap-y-3 gap-x-2 sm:gap-6 text-[10px] sm:text-sm font-bold uppercase tracking-widest text-[var(--color-brand-black)] mb-2 sm:mb-4 border-b-2 border-[var(--color-brand-border)] pb-2 sm:pb-4 w-full place-items-center md:place-items-start">
+                <div className="flex overflow-x-auto no-scrollbar md:flex-wrap gap-4 sm:gap-6 text-[10px] sm:text-sm font-bold uppercase tracking-widest text-[var(--color-brand-black)] mb-2 sm:mb-4 border-b-2 border-[var(--color-brand-border)] pb-2 sm:pb-4 w-full items-center md:items-start text-center md:text-left">
                     {CATEGORIES.map(cat => (
                         <span
                             key={cat}

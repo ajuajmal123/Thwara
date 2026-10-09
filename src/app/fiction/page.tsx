@@ -25,7 +25,7 @@ export default function FictionPage() {
                 </div>
 
                 {/* Filter Categories */}
-                <div className="grid grid-cols-3 md:flex md:flex-row md:flex-wrap gap-y-3 gap-x-2 sm:gap-6 text-[10px] sm:text-sm font-bold uppercase tracking-widest text-[var(--color-brand-black)] pb-2 w-full place-items-center md:place-items-start text-center md:text-left">
+                <div className="flex overflow-x-auto no-scrollbar md:flex-wrap gap-4 sm:gap-6 text-[10px] sm:text-sm font-bold uppercase tracking-widest text-[var(--color-brand-black)] pb-4 w-full items-center md:items-start text-center md:text-left">
                     {CATEGORIES.map(cat => (
                         <span
                             key={cat}
