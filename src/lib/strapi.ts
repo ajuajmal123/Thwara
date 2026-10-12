@@ -18,15 +18,23 @@ export function getStrapiURL(path = "") {
  * @param options Options passed to fetch
  * @returns Parsed API call response
  */
-export async function fetchAPI(path: string, urlParamsObject = {}, options = {}) {
+export async function fetchAPI(path: string, urlParamsObject = {}, options: any = {}) {
+    const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+
     // Merge default options with user options
+    const headers: Record<string, string> = {
+        ...(process.env.STRAPI_API_TOKEN ? { Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}` } : {}),
+        ...(options.headers || {}),
+    };
+
+    // Only set application/json if not uploading FormData
+    if (!isFormData) {
+        headers["Content-Type"] = "application/json";
+    }
+
     const mergedOptions = {
-        headers: {
-            "Content-Type": "application/json",
-            // Include your Strapi API token in your environment variables for authenticated requests
-            ...(process.env.STRAPI_API_TOKEN ? { Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}` } : {}),
-        },
         ...options,
+        headers,
     };
 
     // Build request URL

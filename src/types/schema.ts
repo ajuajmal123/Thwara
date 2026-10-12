@@ -41,13 +41,32 @@ export interface Fiction {
 }
 
 export interface Webzine {
-  webzineName: string;
-  coverImage: string;
-  workName: string;
-  domain: string;
-  date: string;
-  authorName: string; // Author/Narrator Name
-  additionalImages: string[];
+  title?: string;
+  webzineName?: string;
+  issueNumber?: string;
+  coverImage?: any;
+  workName?: string;
+  domain?: string;
+  date?: string;
+  excerpt?: string;
+  description?: string;
+  authorName?: string;
+  additionalImages?: any[];
+  // Curated group of existing works inside this issue:
+  articles?: any;
+  fictions?: any;
+  folklores?: any;
+  tellings?: any;
+}
+
+export interface Submission {
+  authorName?: string;
+  email?: string;
+  title?: string;
+  googleDriveLink?: string;
+  document?: any;
+  agreedToPrivacy: boolean;
+  status?: "Pending" | "Under Review" | "Accepted" | "Rejected";
 }
 
 export interface Author {

@@ -35,10 +35,31 @@ export async function getFolklore(page = 1, pageSize = 10): Promise<StrapiCollec
 }
 
 /**
- * Webzine
+ * Webzine (Curated issues grouping Articles, Fiction, Folklore, Tellings)
  */
 export async function getWebzines(): Promise<StrapiCollectionResponse<Webzine>> {
-    return fetchAPI("/webzines", { populate: "*", sort: ["date:desc"] });
+    return fetchAPI("/webzines", {
+        populate: {
+            coverImage: "*",
+            articles: { populate: "*" },
+            fictions: { populate: "*" },
+            folklores: { populate: "*" },
+            tellings: { populate: "*" }
+        },
+        sort: ["date:desc"]
+    });
+}
+
+export async function getWebzineById(id: string | number): Promise<StrapiSingleResponse<Webzine> | null> {
+    return fetchAPI(`/webzines/${id}`, {
+        populate: {
+            coverImage: "*",
+            articles: { populate: "*" },
+            fictions: { populate: "*" },
+            folklores: { populate: "*" },
+            tellings: { populate: "*" }
+        }
+    });
 }
 
 /**
@@ -50,10 +71,16 @@ export async function getAuthors(): Promise<StrapiCollectionResponse<Author>> {
 
 /**
  * Submissions (POST Request to send user uploads securely to Strapi)
+ * Accepts either a FormData instance (for file uploads) or a JSON payload.
  */
-export async function postSubmission(submissionData: any) {
-    // Note: To accept File uploads (PDFs, DOCX), you might use FormData instead of JSON,
-    // but here is a standard representation of calling a Strapi create endpoint.
+export async function postSubmission(submissionData: FormData | any) {
+    if (typeof FormData !== "undefined" && submissionData instanceof FormData) {
+        return fetchAPI("/submissions", {}, {
+            method: "POST",
+            body: submissionData
+        });
+    }
+
     return fetchAPI("/submissions", {}, {
         method: "POST",
         body: JSON.stringify({ data: submissionData })

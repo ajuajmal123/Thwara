@@ -1,21 +1,53 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getArticles } from '@/services/strapiServices';
+import { getStrapiMedia } from '@/lib/strapi';
 
 const CATEGORIES = ["All", "Literature", "Library", "Psychology", "History", "Politics", "Culture", "Fashion", "Photo story", "Travelogue", "Memoir"];
 
 export default function ArticlesPage() {
     const [activeCategory, setActiveCategory] = useState("All");
+    const [items, setItems] = useState<any[]>([
+        { id: 1, category: "Literature", title: "Critical Analysis on Subject #1", author: "John Doe", coverImage: "https://picsum.photos/seed/articles1/600/400" },
+        { id: 2, category: "History", title: "Critical Analysis on Subject #2", author: "John Doe", coverImage: "https://picsum.photos/seed/articles2/600/400" },
+        { id: 3, category: "Culture", title: "Critical Analysis on Subject #3", author: "John Doe", coverImage: "https://picsum.photos/seed/articles3/600/400" },
+        { id: 4, category: "Politics", title: "Critical Analysis on Subject #4", author: "John Doe", coverImage: "https://picsum.photos/seed/articles4/600/400" },
+        { id: 5, category: "Memoir", title: "Critical Analysis on Subject #5", author: "John Doe", coverImage: "https://picsum.photos/seed/articles5/600/400" },
+        { id: 6, category: "Travelogue", title: "Critical Analysis on Subject #6", author: "John Doe", coverImage: "https://picsum.photos/seed/articles6/600/400" },
+    ]);
 
-    const items = [
-        { id: 1, category: "Literature" },
-        { id: 2, category: "History" },
-        { id: 3, category: "Culture" },
-        { id: 4, category: "Politics" },
-        { id: 5, category: "Memoir" },
-        { id: 6, category: "Travelogue" },
-    ];
+    useEffect(() => {
+        async function fetchLiveArticles() {
+            try {
+                const res = await getArticles();
+                if (res?.data && res.data.length > 0) {
+                    const mapped = res.data.map((entity: any) => {
+                        const attr = entity.attributes || entity;
+                        const cover = attr.coverImage?.data?.attributes?.url
+                            ? getStrapiMedia(attr.coverImage.data.attributes.url)
+                            : `https://picsum.photos/seed/articles${entity.id}/600/400`;
+
+                        return {
+                            id: entity.id,
+                            category: attr.domain || "Literature",
+                            title: attr.title || `Article #${entity.id}`,
+                            author: attr.authorName || attr.author?.data?.attributes?.name || "Thwara Editorial",
+                            coverImage: cover || `https://picsum.photos/seed/articles${entity.id}/600/400`,
+                            subheading: attr.subheading,
+                            slug: attr.slug || entity.id,
+                        };
+                    });
+                    setItems(mapped);
+                }
+            } catch (err) {
+                // Fallback gracefully
+                console.log("Using static articles as fallback");
+            }
+        }
+        fetchLiveArticles();
+    }, []);
 
     const filteredItems = activeCategory === "All" ? items : items.filter(item => item.category === activeCategory);
 
@@ -43,14 +75,14 @@ export default function ArticlesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredItems.map((item) => (
                         <div key={item.id} className="flex flex-col border-2 border-[var(--color-brand-border)] rounded p-4 group bg-white shadow-sm hover:shadow-md transition-shadow">
-                            <img src={`https://picsum.photos/seed/articles${item.id}/600/400`} className="w-full aspect-video object-cover rounded border-2 border-[var(--color-brand-border)] mb-4" loading="lazy" />
+                            <img src={item.coverImage} className="w-full aspect-video object-cover rounded border-2 border-[var(--color-brand-border)] mb-4" loading="lazy" alt={item.title} />
                             <span className="text-[var(--color-brand-red)] font-bold text-xs uppercase mb-1">{item.category}</span>
-                            <h2 className="text-xl font-bold text-black mb-2 leading-tight">Critical Analysis on Subject #{item.id}</h2>
+                            <h2 className="text-xl font-bold text-black mb-2 leading-tight line-clamp-2">{item.title}</h2>
                             <p className="text-black text-sm mb-4 line-clamp-3">
-                                A comprehensive look at the intersection of modern culture and traditional practices, highlighting key insights and perspectives.
+                                {item.subheading || "A comprehensive look at the intersection of modern culture and traditional practices, highlighting key insights and perspectives."}
                             </p>
                             <div className="mt-auto flex justify-between items-center text-black border-t-2 border-dotted border-[var(--color-brand-border)] pt-4">
-                                <span className="font-bold text-xs uppercase text-[var(--color-brand-red)]">John Doe</span>
+                                <span className="font-bold text-xs uppercase text-[var(--color-brand-red)]">{item.author}</span>
                                 <Link href="#" className="font-bold text-xs flex items-center gap-1 group-hover:text-[var(--color-brand-red)]">
                                     READ <span className="text-lg">→</span>
                                 </Link>

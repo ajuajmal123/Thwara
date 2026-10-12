@@ -1,23 +1,59 @@
 "use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { getWebzines } from "@/services/strapiServices";
+import { WEBZINE_PROJECTS } from "@/data/webzine";
+import { getStrapiMedia } from "@/lib/strapi";
 
 const CATEGORIES = ["All", "Visual Essay", "Digital Storytelling", "Experimental Archive", "Interactive Essay", "Image + Text", "Collaborative Fiction"];
 
 export default function WebzinePage() {
     const [activeCategory, setActiveCategory] = useState("All");
+    const [items, setItems] = useState<any[]>(() => {
+        return WEBZINE_PROJECTS.map((p, idx) => ({
+            id: p.id,
+            category: p.type,
+            title: p.title,
+            slug: p.slug,
+            date: p.date,
+            coverImage: `https://picsum.photos/seed/webzine_cover${idx + 1}/400/550`,
+            articlesCount: 0,
+        }));
+    });
 
-    const items = [
-        { id: 1, category: "Visual Essay", title: "Monsoon Notes", date: "Oct 2026" },
-        { id: 2, category: "Digital Storytelling", title: "A City in Fragments", date: "Sep 2026" },
-        { id: 3, category: "Experimental Archive", title: "Listening to the Coast", date: "Aug 2026" },
-        { id: 4, category: "Interactive Essay", title: "Between Two Languages", date: "Jul 2026" },
-        { id: 5, category: "Image + Text", title: "The Unfinished Archive", date: "May 2026" },
-        { id: 6, category: "Collaborative Fiction", title: "Letters From Elsewhere", date: "Mar 2026" },
-        { id: 7, category: "Visual Essay", title: "Winter Solstice", date: "Dec 2025" },
-        { id: 8, category: "Image + Text", title: "Urban Chronicles", date: "Nov 2025" },
-    ];
+    useEffect(() => {
+        async function fetchLiveIssues() {
+            try {
+                const res = await getWebzines();
+                if (res?.data && res.data.length > 0) {
+                    const mapped = res.data.map((entity: any) => {
+                        const attr = entity.attributes || entity;
+                        const coverUrl = attr.coverImage?.data?.attributes?.url
+                            ? getStrapiMedia(attr.coverImage.data.attributes.url)
+                            : `https://picsum.photos/seed/webzine_cover${entity.id}/400/550`;
+
+                        const articlesCount = (attr.articles?.data?.length || attr.articles?.length || 0);
+
+                        return {
+                            id: entity.id,
+                            category: attr.domain || "Visual Essay",
+                            title: attr.title || attr.webzineName || attr.workName || `Issue #${entity.id}`,
+                            slug: attr.slug || (entity.id).toString(),
+                            date: attr.date || "2026",
+                            coverImage: coverUrl,
+                            articlesCount,
+                        };
+                    });
+                    setItems(mapped);
+                }
+            } catch (err) {
+                // Keep default static items gracefully if Strapi is offline or seeding
+                console.log("Using static Webzine issues as fallback");
+            }
+        }
+        fetchLiveIssues();
+    }, []);
 
     const filteredItems = activeCategory === "All" ? items : items.filter(item => item.category === activeCategory);
 
@@ -46,13 +82,17 @@ export default function WebzinePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredItems.map((item) => (
                         <div key={item.id} className="flex flex-col items-center p-4 border-2 border-[var(--color-brand-border)] rounded bg-white shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
-                            <img src={`https://picsum.photos/seed/webzine_cover${item.id}/400/550`} className="w-full aspect-[3/4] object-cover border-2 border-black rounded shadow" loading="lazy" />
+                            <img src={item.coverImage} className="w-full aspect-[3/4] object-cover border-2 border-black rounded shadow" loading="lazy" alt={item.title} />
                             <span className="text-[var(--color-brand-red)] font-bold text-[10px] uppercase mt-2 tracking-widest">{item.category}</span>
-                            <h2 className="text-xl font-bold text-black mt-2 text-center">{item.title}</h2>
+                            <h2 className="text-xl font-bold text-black mt-2 text-center line-clamp-1">{item.title}</h2>
                             <p className="text-black font-medium text-xs mt-1 mb-4">{item.date}</p>
-                            <button className="w-full border-2 border-[var(--color-brand-red)] text-black py-2 rounded text-sm font-bold hover:bg-[var(--color-brand-red)] hover:text-white transition-colors uppercase">
+
+                            <Link
+                                href={`/webzine/${item.slug || "monsoon-notes"}`}
+                                className="w-full border-2 border-[var(--color-brand-red)] text-black py-2 rounded text-sm font-bold hover:bg-[var(--color-brand-red)] hover:text-white transition-colors uppercase text-center block"
+                            >
                                 Read Online
-                            </button>
+                            </Link>
                         </div>
                     ))}
                     {filteredItems.length === 0 && (
