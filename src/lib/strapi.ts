@@ -22,8 +22,9 @@ export async function fetchAPI(path: string, urlParamsObject = {}, options: any 
     const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
 
     // Merge default options with user options
+    const token = process.env.STRAPI_API_TOKEN || process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
     const headers: Record<string, string> = {
-        ...(process.env.STRAPI_API_TOKEN ? { Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}` } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {}),
     };
 

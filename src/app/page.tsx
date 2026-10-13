@@ -35,7 +35,7 @@ export default function Home() {
       <section className="border-4 border-[var(--color-brand-border)] p-4 sm:p-8 md:p-12 rounded-lg bg-white flex flex-col">
         <div className="flex flex-col gap-2 sm:gap-4 max-w-3xl mx-auto w-full">
           <span className="text-[var(--color-brand-red)] text-4xl sm:text-6xl font-serif leading-none h-2 sm:h-4 text-left">“</span>
-          <h2 className="text-[13px] sm:text-base md:text-2xl lg:text-3xl font-bold text-black italic leading-normal sm:leading-relaxed text-justify px-1 sm:px-2 md:px-4">
+          <h2 className="text-[15px] sm:text-base md:text-2xl lg:text-3xl font-bold text-black italic leading-normal sm:leading-relaxed text-justify px-1 sm:px-2 md:px-4">
             We never read with our eyes alone. We read through the social, cultural, and historical lenses we carry.
           </h2>
           <span className="text-[var(--color-brand-red)] text-4xl sm:text-6xl font-serif leading-none h-2 sm:h-4 text-right mt-2 sm:mt-0">”</span>

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Libre_Bodoni, Noto_Sans_Malayalam } from "next/font/google";
+import { EB_Garamond, Noto_Sans_Malayalam } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
-const libreBodoni = Libre_Bodoni({
-  variable: "--font-libre-bodoni",
+const ebGaramond = EB_Garamond({
+  variable: "--font-eb-garamond",
   subsets: ["latin"],
 });
 
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${libreBodoni.variable} ${malayalam.variable} antialiased`}
+      className={`${ebGaramond.variable} ${malayalam.variable} antialiased`}
     >
       <body className="min-h-screen flex flex-col pt-0">
         <Header />
