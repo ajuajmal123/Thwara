@@ -16,7 +16,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     id: "1",
     slug: "muhammed-ajmal-kk",
     name: "Muhammed Ajmal KK",
-    image: "/Muhammed_ajmal kk.jpeg",
+    image: "/Muhammed_ajmal_kk.jpeg",
     shortBio: "A Full Stack Developer and independent website designer who built this platform, combining modern frontend technologies with efficient backend content management to deliver a seamless digital experience.",
     fullBio: "Muhammed Ajmal KK is a Full Stack Developer and independent website designer who designed and built this platform to deliver an accessible, seamless, and user-friendly digital experience. Combining modern frontend technologies with efficient backend content management solutions, he collaborates closely with the team to enhance functionality, performance, and overall user engagement. Driven by a passion for technology, his broader research interests also extend to oral studies and tech-driven research.",
     interests: ["Full Stack Development", "Web Design", "Frontend Technologies", "Content Management", "Oral Studies", "Tech-driven Research"],

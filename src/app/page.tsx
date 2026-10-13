@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Home() {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
+  const mounted = useRef(false);
 
   useEffect(() => {
+    // Only run on the very first client mount — avoids SSR/hydration mismatch
+    if (mounted.current) return;
+    mounted.current = true;
+    setShowSplash(true);
     const timer = setTimeout(() => {
       setShowSplash(false);
-    }, 2500); // 2.5 seconds duration for splash screen
+    }, 2500);
     return () => clearTimeout(timer);
   }, []);
 

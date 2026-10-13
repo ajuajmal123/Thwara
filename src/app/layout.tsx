@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Noto_Sans_Malayalam } from "next/font/google";
+import { Libre_Baskerville, Noto_Sans_Malayalam } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
-const ebGaramond = EB_Garamond({
-  variable: "--font-eb-garamond",
+const libreBaskerville = Libre_Baskerville({
+  variable: "--font-libre-baskerville",
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 const malayalam = Noto_Sans_Malayalam({
@@ -27,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${ebGaramond.variable} ${malayalam.variable} antialiased`}
+      className={`${libreBaskerville.variable} ${malayalam.variable} antialiased`}
     >
       <body className="min-h-screen flex flex-col pt-0">
         <Header />

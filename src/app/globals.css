@@ -15,8 +15,8 @@
   --color-brand-border: #0F3A20;
   /* Light green outline */
 
-  --font-sans: var(--font-eb-garamond), var(--font-noto-malayalam), sans-serif;
-  --font-serif: var(--font-eb-garamond), var(--font-noto-malayalam), serif;
+  --font-sans: var(--font-libre-baskerville), var(--font-noto-malayalam), sans-serif;
+  --font-serif: var(--font-libre-baskerville), var(--font-noto-malayalam), serif;
 }
 
 /* Base resets & styles */

@@ -38,12 +38,12 @@ export default function Header() {
                         </div>
                     </button>
 
-                    <nav className="hidden xl:flex items-center flex-wrap gap-x-4 gap-y-2">
+                    <nav className="hidden xl:flex items-center flex-nowrap gap-x-3">
                         {NAV_LINKS.map((link) => (
                             <Link
                                 key={link.label}
                                 href={link.href}
-                                className="text-xs lg:text-sm font-bold text-black uppercase transition-colors hover:text-[var(--color-brand-red)] hover:underline decoration-[var(--color-brand-green)] underline-offset-4"
+                                className="text-[11px] 2xl:text-sm font-bold text-black uppercase transition-colors hover:text-[var(--color-brand-red)] hover:underline decoration-[var(--color-brand-green)] underline-offset-4 whitespace-nowrap"
                             >
                                 {link.label}
                             </Link>
@@ -57,7 +57,7 @@ export default function Header() {
                         <input
                             type="text"
                             placeholder="Search..."
-                            className="bg-transparent border-none outline-none py-1 px-3 text-sm text-black placeholder:text-gray-400 focus:ring-0 w-32 md:w-48 lg:w-64"
+                            className="bg-transparent border-none outline-none py-1 px-3 text-sm text-black placeholder:text-gray-400 focus:ring-0 w-24 xl:w-28 2xl:w-48"
                         />
                         <button aria-label="Search" className="px-3 text-[var(--color-brand-red)]">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
