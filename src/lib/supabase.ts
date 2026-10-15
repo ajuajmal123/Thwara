@@ -1,6 +1,8 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const rawSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+// Automatically strip trailing /rest/v1 or trailing slash if user copied from API dashboard
+export const supabaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, "");
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
@@ -12,7 +14,7 @@ export function isSupabaseConfigured(): boolean {
     supabaseUrl &&
     supabaseUrl.startsWith("http") &&
     supabaseAnonKey &&
-    supabaseAnonKey.length > 10
+    supabaseAnonKey.length > 5
   );
 }
 
