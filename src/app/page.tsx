@@ -71,14 +71,14 @@ export default function Home() {
           return {
             id: e.id,
             title: a.title || `Article #${e.id}`,
-            author: a.authorName || a.author?.name || "Thwara Editorial",
+            author: a.author_name || a.authorName || a.author?.name || "Thwara Editorial",
             category: a.domain || "Article",
             slug: a.slug || String(e.id),
-            coverImage: a.coverImage?.url
+            coverImage: a.cover_image || (a.coverImage?.url
               ? getStrapiMedia(a.coverImage.url) || ""
               : a.coverImage?.data?.attributes?.url
                 ? getStrapiMedia(a.coverImage.data.attributes.url) || ""
-                : "",
+                : ""),
           };
         }));
       } else {
@@ -92,9 +92,10 @@ export default function Home() {
           return {
             id: e.id,
             title: a.title || `Fiction #${e.id}`,
-            author: a.authorName || a.author?.name || "Thwara",
-            type: a.domain || a.type || "Short Story",
+            author: a.author_name || a.authorName || a.author?.name || "Thwara",
+            type: a.genre || a.domain || a.type || "Short Story",
             slug: a.slug || String(e.id),
+            coverImage: a.cover_image || "",
           };
         }));
       } else {
@@ -108,13 +109,13 @@ export default function Home() {
           return {
             id: e.id,
             title: a.title || `Folklore #${e.id}`,
-            author: a.authorName || a.author?.name || "Thwara",
+            author: a.narrator_name || a.authorName || a.author?.name || "Thwara Archive",
             slug: a.slug || String(e.id),
-            coverImage: a.coverImage?.url
+            coverImage: a.cover_image || (a.coverImage?.url
               ? getStrapiMedia(a.coverImage.url) || ""
               : a.coverImage?.data?.attributes?.url
                 ? getStrapiMedia(a.coverImage.data.attributes.url) || ""
-                : "",
+                : ""),
           };
         }));
       } else {
@@ -127,15 +128,15 @@ export default function Home() {
           const a = e.attributes || e;
           return {
             id: e.id,
-            title: a.title || a.webzineName || `Issue #${e.id}`,
+            title: a.title || a.webzine_name || a.webzineName || `Issue #${e.id}`,
             date: a.date || "2026",
             slug: a.slug || String(e.id),
             category: a.domain || "Visual Essay",
-            coverImage: a.coverImage?.url
+            coverImage: a.cover_image || (a.coverImage?.url
               ? getStrapiMedia(a.coverImage.url) || ""
               : a.coverImage?.data?.attributes?.url
                 ? getStrapiMedia(a.coverImage.data.attributes.url) || ""
-                : "",
+                : ""),
           };
         }));
       } else {

@@ -18,7 +18,7 @@ export default function ArticleCard({ article, variant = "default", className = 
 
     if (variant === "minimal") {
         return (
-            <Link href={`/article/${article.slug}`} className={`group flex flex-col md:flex-row p-6 md:p-8 outline-none hover:bg-neutral-50 transition-colors ${hideBorder ? '' : 'border-b-[0.5px] border-[var(--color-brand-border)]'} ${className}`}>
+            <Link href={`/articles/${article.slug}`} className={`group flex flex-col md:flex-row p-6 md:p-8 outline-none hover:bg-neutral-50 transition-colors ${hideBorder ? '' : 'border-b-[0.5px] border-[var(--color-brand-border)]'} ${className}`}>
                 {/* Number / Metadata Column */}
                 <div className="w-full md:w-[15%] md:border-r-[0.5px] border-[var(--color-brand-border)] flex flex-col justify-start mb-4 md:mb-0 md:pr-4">
                     <div className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--color-brand-gray)] group-hover:text-[var(--color-brand-black)] transition-colors">
@@ -62,7 +62,7 @@ export default function ArticleCard({ article, variant = "default", className = 
                     </div>
                 </div>
 
-                <Link href={`/article/${article.slug}`} className="block relative w-full aspect-[4/3] sm:aspect-[3/2] overflow-hidden mb-8 bg-neutral-100">
+                <Link href={`/articles/${article.slug}`} className="block relative w-full aspect-[4/3] sm:aspect-[3/2] overflow-hidden mb-8 bg-neutral-100">
                     <Image
                         src={article.coverImage}
                         alt={article.title}
@@ -73,7 +73,7 @@ export default function ArticleCard({ article, variant = "default", className = 
                     />
                 </Link>
 
-                <Link href={`/article/${article.slug}`} className="outline-none block mb-6 px-2">
+                <Link href={`/articles/${article.slug}`} className="outline-none block mb-6 px-2">
                     <h2 className={`text-4xl md:text-5xl lg:text-[4rem] font-medium text-[var(--color-foreground)] ${titleClass}`}>
                         {article.title}
                     </h2>
@@ -105,7 +105,7 @@ export default function ArticleCard({ article, variant = "default", className = 
                 <span className="text-[9px] uppercase tracking-[0.2em] text-[var(--color-brand-gray)]">{article.language}</span>
             </div>
 
-            <Link href={`/article/${article.slug}`} className="outline-none flex-1 p-6 lg:p-8 hover:bg-neutral-50 transition-colors">
+            <Link href={`/articles/${article.slug}`} className="outline-none flex-1 p-6 lg:p-8 hover:bg-neutral-50 transition-colors">
                 <h3 className={`text-2xl md:text-3xl font-medium text-[var(--color-foreground)] ${titleClass}`}>
                     {article.title}
                 </h3>

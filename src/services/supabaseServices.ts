@@ -109,15 +109,38 @@ export async function getArticleBySlug(slug: string): Promise<StrapiSingleRespon
   if (!supabase) return null;
 
   try {
-    const { data, error } = await supabase
+    const raw = String(slug);
+    let decoded = raw;
+    try {
+      decoded = decodeURIComponent(raw);
+    } catch {
+      // keep raw
+    }
+
+    // Try finding by slug first (both decoded and raw)
+    const { data: bySlug, error: slugErr } = await supabase
       .from("articles")
       .select("*")
-      .eq("slug", slug)
+      .in("slug", [decoded, raw])
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (error || !data) return null;
-    return { data: normalizeEntity<Article>(data) };
+    if (!slugErr && bySlug) {
+      return { data: normalizeEntity<Article>(bySlug) };
+    }
+
+    // Fallback if accessed via numeric id
+    if (!isNaN(Number(raw))) {
+      const { data: byId } = await supabase
+        .from("articles")
+        .select("*")
+        .eq("id", Number(raw))
+        .limit(1)
+        .maybeSingle();
+      if (byId) return { data: normalizeEntity<Article>(byId) };
+    }
+
+    return null;
   } catch (err) {
     console.error("[Supabase] getArticleBySlug exception:", err);
     return null;
@@ -278,6 +301,94 @@ export async function getFolklore(page = 1, pageSize = 10): Promise<StrapiCollec
 }
 
 /**
+ * Fetches a single Fiction piece by slug or ID
+ */
+export async function getFictionBySlug(slug: string): Promise<StrapiSingleResponse<Fiction> | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  try {
+    const raw = String(slug);
+    let decoded = raw;
+    try {
+      decoded = decodeURIComponent(raw);
+    } catch {
+      // keep raw
+    }
+
+    const { data: bySlug, error: slugErr } = await supabase
+      .from("fictions")
+      .select("*")
+      .in("slug", [decoded, raw])
+      .limit(1)
+      .maybeSingle();
+
+    if (!slugErr && bySlug) {
+      return { data: normalizeEntity<Fiction>(bySlug) };
+    }
+
+    if (!isNaN(Number(raw))) {
+      const { data: byId } = await supabase
+        .from("fictions")
+        .select("*")
+        .eq("id", Number(raw))
+        .limit(1)
+        .maybeSingle();
+      if (byId) return { data: normalizeEntity<Fiction>(byId) };
+    }
+
+    return null;
+  } catch (err) {
+    console.error("[Supabase] getFictionBySlug exception:", err);
+    return null;
+  }
+}
+
+/**
+ * Fetches a single Folklore entry by slug or ID
+ */
+export async function getFolkloreBySlug(slug: string): Promise<StrapiSingleResponse<Folklore> | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  try {
+    const raw = String(slug);
+    let decoded = raw;
+    try {
+      decoded = decodeURIComponent(raw);
+    } catch {
+      // keep raw
+    }
+
+    const { data: bySlug, error: slugErr } = await supabase
+      .from("folklores")
+      .select("*")
+      .in("slug", [decoded, raw])
+      .limit(1)
+      .maybeSingle();
+
+    if (!slugErr && bySlug) {
+      return { data: normalizeEntity<Folklore>(bySlug) };
+    }
+
+    if (!isNaN(Number(raw))) {
+      const { data: byId } = await supabase
+        .from("folklores")
+        .select("*")
+        .eq("id", Number(raw))
+        .limit(1)
+        .maybeSingle();
+      if (byId) return { data: normalizeEntity<Folklore>(byId) };
+    }
+
+    return null;
+  } catch (err) {
+    console.error("[Supabase] getFolkloreBySlug exception:", err);
+    return null;
+  }
+}
+
+/**
  * Webzine (Curated issues)
  */
 export async function getWebzines(): Promise<StrapiCollectionResponse<Webzine>> {
@@ -317,13 +428,36 @@ export async function getWebzineById(id: string | number): Promise<StrapiSingleR
   if (!supabase) return null;
 
   try {
-    const query = supabase.from("webzines").select("*");
-    const { data, error } = !isNaN(Number(id))
-      ? await query.eq("id", Number(id)).single()
-      : await query.eq("slug", String(id)).single();
+    const raw = String(id);
+    let decoded = raw;
+    try {
+      decoded = decodeURIComponent(raw);
+    } catch {
+      // keep raw
+    }
 
-    if (error || !data) return null;
-    return { data: normalizeEntity<Webzine>(data) };
+    const { data: bySlug, error: slugErr } = await supabase
+      .from("webzines")
+      .select("*")
+      .in("slug", [decoded, raw])
+      .limit(1)
+      .maybeSingle();
+
+    if (!slugErr && bySlug) {
+      return { data: normalizeEntity<Webzine>(bySlug) };
+    }
+
+    if (!isNaN(Number(raw))) {
+      const { data: byId } = await supabase
+        .from("webzines")
+        .select("*")
+        .eq("id", Number(raw))
+        .limit(1)
+        .maybeSingle();
+      if (byId) return { data: normalizeEntity<Webzine>(byId) };
+    }
+
+    return null;
   } catch (err) {
     console.error("[Supabase] getWebzineById exception:", err);
     return null;

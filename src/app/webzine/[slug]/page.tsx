@@ -4,6 +4,9 @@ import Link from "next/link";
 import { WEBZINE_PROJECTS } from "@/data/webzine";
 import { getWebzineById } from "@/services/supabaseServices";
 
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 export function generateStaticParams() {
     return WEBZINE_PROJECTS.map((w) => ({ slug: w.slug }));
 }
@@ -152,7 +155,7 @@ export default async function WebzineDetail({ params }: { params: Promise<{ slug
                                     {art.author && <p className="text-xs text-neutral-500 mt-1">By {art.author}</p>}
                                 </div>
                                 <Link
-                                    href="/articles"
+                                    href={`/articles/${art.slug || art.id}`}
                                     className="mt-4 font-bold text-xs text-[var(--color-brand-red)] hover:underline flex items-center gap-1"
                                 >
                                     Read Article <span>→</span>
@@ -171,7 +174,7 @@ export default async function WebzineDetail({ params }: { params: Promise<{ slug
                                     {fic.author && <p className="text-xs text-neutral-500 mt-1">By {fic.author}</p>}
                                 </div>
                                 <Link
-                                    href="/fiction"
+                                    href={`/fiction/${fic.slug || fic.id}`}
                                     className="mt-4 font-bold text-xs text-[var(--color-brand-red)] hover:underline flex items-center gap-1"
                                 >
                                     Read Fiction <span>→</span>
@@ -190,7 +193,7 @@ export default async function WebzineDetail({ params }: { params: Promise<{ slug
                                     {fol.narrator && <p className="text-xs text-neutral-500 mt-1">Narrated by {fol.narrator}</p>}
                                 </div>
                                 <Link
-                                    href="/folklore"
+                                    href={`/folklore/${fol.slug || fol.id}`}
                                     className="mt-4 font-bold text-xs text-[var(--color-brand-red)] hover:underline flex items-center gap-1"
                                 >
                                     Explore Folklore <span>→</span>
