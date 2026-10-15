@@ -54,7 +54,7 @@ export default function SubmissionsPage() {
         } catch (err: any) {
             console.error("Submission failed:", err);
             setErrorMessage(
-                "Failed to send submission. If your backend is running locally, ensure Strapi public permissions allow creating submissions."
+                "Failed to send submission. Please try again or check that your connection/backend settings are properly configured."
             );
         } finally {
             setIsSubmitting(false);

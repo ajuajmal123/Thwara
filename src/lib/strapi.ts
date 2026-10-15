@@ -1,74 +1,19 @@
-import qs from "qs";
+import { getMediaUrl } from "./supabase";
 
 /**
- * Get full Strapi URL from path
- * @param path Path of the URL
- * @returns Full Strapi URL
+ * Backward compatibility wrapper for media URLs.
+ * Automatically delegates to Supabase media URL resolver.
  */
+export function getStrapiMedia(url: string | null | undefined): string | null {
+    if (!url) return null;
+    return getMediaUrl(url);
+}
+
 export function getStrapiURL(path = "") {
-    return `${
-        process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://127.0.0.1:1337"
-    }${path}`;
+    return `${process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://127.0.0.1:1337"}${path}`;
 }
 
-/**
- * Helper to make GET requests to Strapi API endpoints
- * @param path Path of the API route
- * @param urlParamsObject URL params object, will be stringified using qs
- * @param options Options passed to fetch
- * @returns Parsed API call response
- */
-export async function fetchAPI(path: string, urlParamsObject = {}, options: any = {}) {
-    const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
-
-    // Merge default options with user options
-    const token = process.env.STRAPI_API_TOKEN || process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
-    const headers: Record<string, string> = {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(options.headers || {}),
-    };
-
-    // Only set application/json if not uploading FormData
-    if (!isFormData) {
-        headers["Content-Type"] = "application/json";
-    }
-
-    const mergedOptions = {
-        ...options,
-        headers,
-    };
-
-    // Build request URL
-    const queryString = qs.stringify(urlParamsObject, { encodeValuesOnly: true });
-    const requestUrl = getStrapiURL(`/api${path}${queryString ? `?${queryString}` : ""}`);
-
-    console.log(`[Strapi API] Fetching: ${requestUrl}`);
-
-    // Trigger API call
-    const response = await fetch(requestUrl, mergedOptions);
-
-    // Handle response
-    if (!response.ok) {
-        console.error(response.statusText);
-        throw new Error(`An error occurred please try again: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data;
-}
-
-/**
- * Helper to extract media URL (mainly for Strapi images/assets)
- */
-export function getStrapiMedia(url: string | null) {
-    if (url == null) {
-        return null;
-    }
-
-    // Return the full URL if the media is hosted on an external provider
-    if (url.startsWith("http") || url.startsWith("//")) {
-        return url;
-    }
-
-    // Otherwise prepend the Strapi backend URL
-    return `${process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://127.0.0.1:1337"}${url}`;
+export async function fetchAPI(path: string, _urlParamsObject = {}, _options: any = {}) {
+    console.warn(`[API] Legacy fetchAPI called for: ${path}. Transitioning to Supabase.`);
+    return { data: [] };
 }
