@@ -29,20 +29,24 @@ export default function WebzinePage() {
                 if (res?.data && res.data.length > 0) {
                     const mapped = res.data.map((entity: any) => {
                         const attr = entity.attributes || entity;
-                        const coverUrl = attr.coverImage?.data?.attributes?.url
+                        const coverUrl = attr.cover_image || (attr.coverImage?.data?.attributes?.url
                             ? getStrapiMedia(attr.coverImage.data.attributes.url)
-                            : `https://picsum.photos/seed/webzine_cover${entity.id}/400/550`;
+                            : `https://picsum.photos/seed/webzine_cover${entity.id}/400/550`);
 
-                        const articlesCount = (attr.articles?.data?.length || attr.articles?.length || 0);
+                        const artCount = Array.isArray(attr.articles) ? attr.articles.length : (attr.articles?.data?.length || 0);
+                        const ficCount = Array.isArray(attr.fictions) ? attr.fictions.length : 0;
+                        const folCount = Array.isArray(attr.folklores) ? attr.folklores.length : 0;
+                        const telCount = Array.isArray(attr.tellings) ? attr.tellings.length : 0;
+                        const totalWorks = artCount + ficCount + folCount + telCount;
 
                         return {
                             id: entity.id,
                             category: attr.domain || "Visual Essay",
-                            title: attr.title || attr.webzineName || attr.workName || `Issue #${entity.id}`,
+                            title: attr.title || attr.webzine_name || attr.webzineName || attr.workName || `Issue #${entity.id}`,
                             slug: attr.slug || (entity.id).toString(),
                             date: attr.date || "2026",
                             coverImage: coverUrl,
-                            articlesCount,
+                            articlesCount: totalWorks,
                         };
                     });
                     setItems(mapped);
@@ -91,7 +95,7 @@ export default function WebzinePage() {
                                 href={`/webzine/${item.slug || "monsoon-notes"}`}
                                 className="w-full border-2 border-[var(--color-brand-red)] text-black py-2 rounded text-sm font-bold hover:bg-[var(--color-brand-red)] hover:text-white transition-colors uppercase text-center block"
                             >
-                                Read Online
+                                {item.articlesCount > 0 ? `Read Online (${item.articlesCount} Works)` : "Read Online"}
                             </Link>
                         </div>
                     ))}

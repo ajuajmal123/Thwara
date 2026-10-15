@@ -1,21 +1,42 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getTellings } from "@/services/supabaseServices";
 
 const CATEGORIES = ["All", "Stories", "Podcast", "Interview"];
 
 export default function TellingsPage() {
     const [activeCategory, setActiveCategory] = useState("All");
+    const [items, setItems] = useState<any[]>([
+        { id: 1, title: "Audio Series #1", type: "Stories", spotifyUrl: "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0" },
+        { id: 2, title: "Critical Voices Podcast", type: "Podcast", spotifyUrl: "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0" },
+        { id: 3, title: "Conversations with Writers", type: "Interview", spotifyUrl: "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0" },
+    ]);
 
-    const items = [
-        { id: 1, type: "Stories" },
-        { id: 2, type: "Podcast" },
-        { id: 3, type: "Interview" },
-        { id: 4, type: "Stories" },
-        { id: 5, type: "Podcast" },
-        { id: 6, type: "Interview" },
-    ];
+    useEffect(() => {
+        async function fetchLiveTellings() {
+            try {
+                const res = await getTellings();
+                if (res?.data && res.data.length > 0) {
+                    const mapped = res.data.map((entity: any) => {
+                        const attr = entity.attributes || entity;
+                        return {
+                            id: entity.id,
+                            title: attr.title || `Audio Piece #${entity.id}`,
+                            type: attr.category || "Stories",
+                            coverImage: attr.cover_image || attr.coverImage,
+                            spotifyUrl: attr.spotify_url || attr.spotifyUrl,
+                            audioUrl: attr.audio_url || attr.audioUrl,
+                        };
+                    });
+                    setItems(mapped);
+                }
+            } catch (err) {
+                console.log("Using static tellings as fallback");
+            }
+        }
+        fetchLiveTellings();
+    }, []);
 
     const filteredItems = activeCategory === "All" ? items : items.filter(item => item.type === activeCategory);
 
@@ -50,25 +71,46 @@ export default function TellingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-2">
                     {filteredItems.map((item) => (
                         <div key={item.id} className="flex flex-col gap-3 border-2 border-[var(--color-brand-border)] p-4 rounded bg-white hover:shadow-md transition-shadow">
-                            <div className="w-full aspect-video bg-neutral-100 rounded border-2 border-[var(--color-brand-border)] flex items-center justify-center">
-                                <span className="text-4xl text-[var(--color-brand-red)]">🎧</span>
-                            </div>
+                            {item.coverImage ? (
+                                <img
+                                    src={item.coverImage}
+                                    alt={item.title}
+                                    className="w-full aspect-video object-cover rounded border-2 border-[var(--color-brand-border)]"
+                                    loading="lazy"
+                                />
+                            ) : (
+                                <div className="w-full aspect-video bg-neutral-100 rounded border-2 border-[var(--color-brand-border)] flex items-center justify-center">
+                                    <span className="text-4xl text-[var(--color-brand-red)]">🎧</span>
+                                </div>
+                            )}
+
                             <div className="flex flex-col gap-2 text-left">
-                                <h3 className="text-xl font-bold text-black">Audio Series #{item.id}</h3>
+                                <h3 className="text-xl font-bold text-black">{item.title}</h3>
                                 <span className="text-xs text-[var(--color-brand-red)] font-bold uppercase tracking-wider">{item.type}</span>
                                 <p className="text-sm text-black line-clamp-2 mt-1">An engaging piece blending sound, narrative, and critical storytelling. Explore the depths of our audio catalog.</p>
-                                <div className="mt-4 w-full">
-                                    <iframe
-                                        style={{ borderRadius: '8px' }}
-                                        src={`https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0`}
-                                        width="100%"
-                                        height="80"
-                                        frameBorder="0"
-                                        allowFullScreen
-                                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                        loading="lazy"
-                                    ></iframe>
-                                </div>
+                                
+                                {item.spotifyUrl && (
+                                    <div className="mt-4 w-full">
+                                        <iframe
+                                            style={{ borderRadius: '8px' }}
+                                            src={item.spotifyUrl}
+                                            width="100%"
+                                            height="80"
+                                            frameBorder="0"
+                                            allowFullScreen
+                                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                            loading="lazy"
+                                        ></iframe>
+                                    </div>
+                                )}
+
+                                {item.audioUrl && (
+                                    <div className="mt-2 w-full">
+                                        <audio controls className="w-full h-8" src={item.audioUrl}>
+                                            Your browser does not support audio playback.
+                                        </audio>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

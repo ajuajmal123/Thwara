@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const COL1_LINKS = [
     { label: "About", href: "/about" },
@@ -18,6 +21,13 @@ const COL2_LINKS = [
 ];
 
 export default function Footer() {
+    const pathname = usePathname();
+
+    // Hide Footer on all admin routes
+    if (pathname?.startsWith("/admin")) {
+        return null;
+    }
+
     return (
         <footer className="bg-white w-full border-t-4 border-[var(--color-brand-border)] p-4">
             <div className="max-w-[1400px] mx-auto border-4 border-[var(--color-brand-border)] rounded-md p-6 sm:p-8">

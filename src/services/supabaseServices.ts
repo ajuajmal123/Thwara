@@ -162,6 +162,41 @@ export async function getTellingsByCategory(
   }
 }
 
+export async function getTellings(
+  category?: string
+): Promise<StrapiCollectionResponse<Tellings>> {
+  const supabase = getSupabase();
+  if (!supabase) return emptyCollection<Tellings>();
+
+  try {
+    let query = supabase.from("tellings").select("*").order("created_at", { ascending: false });
+    if (category && category !== "All") {
+      query = query.eq("category", category);
+    }
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("[Supabase] getTellings error:", error.message);
+      return emptyCollection<Tellings>();
+    }
+
+    return {
+      data: (data || []).map((row) => normalizeEntity<Tellings>(row)),
+      meta: {
+        pagination: {
+          page: 1,
+          pageSize: data?.length || 10,
+          pageCount: 1,
+          total: data?.length || 0,
+        },
+      },
+    };
+  } catch (err) {
+    console.error("[Supabase] getTellings exception:", err);
+    return emptyCollection<Tellings>();
+  }
+}
+
 /**
  * Fiction
  */
@@ -406,7 +441,7 @@ export async function postSubmission(submissionData: FormData | any) {
     }
   }
 
-  // Insert submission row into PostgreSQL
+  // Insert submission row into PostgreSQL (no .select() so anon role doesn't hit SELECT RLS block)
   const { data, error } = await supabase
     .from("submissions")
     .insert([
@@ -420,8 +455,7 @@ export async function postSubmission(submissionData: FormData | any) {
         agreed_to_privacy: payload.agreedToPrivacy ?? true,
         status: payload.status || "Pending",
       },
-    ])
-    .select();
+    ]);
 
   if (error) {
     console.error("[Supabase] Submission insert error:", error.message);

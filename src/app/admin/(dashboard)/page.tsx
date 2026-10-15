@@ -36,6 +36,15 @@ export default async function AdminOverviewPage() {
       icon: "📖",
     },
     {
+      title: "Tellings & Audio",
+      count: stats?.tellingsCount ?? 0,
+      description: "Audio stories, podcasts, and creator interviews",
+      href: "/admin/tellings",
+      color: "border-[var(--color-brand-border)]",
+      badgeColor: "bg-[var(--color-brand-green)]",
+      icon: "🎧",
+    },
+    {
       title: "Webzine Issues",
       count: stats?.webzinesCount ?? 0,
       description: "Curated digital issues and multimedia exhibits",

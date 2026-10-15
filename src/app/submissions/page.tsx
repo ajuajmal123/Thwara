@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { postSubmission } from "@/services/strapiServices";
+import { submitPitchAction } from "./actions";
 
 export default function SubmissionsPage() {
     const [name, setName] = useState("");
@@ -49,12 +49,12 @@ export default function SubmissionsPage() {
                 formData.append("files.document", file);
             }
 
-            await postSubmission(formData);
+            await submitPitchAction(formData);
             setSubmitted(true);
         } catch (err: any) {
             console.error("Submission failed:", err);
             setErrorMessage(
-                "Failed to send submission. Please try again or check that your connection/backend settings are properly configured."
+                err?.message || "Failed to send submission. Please try again or check your backend connection."
             );
         } finally {
             setIsSubmitting(false);

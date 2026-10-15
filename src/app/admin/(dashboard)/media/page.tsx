@@ -8,6 +8,7 @@ export default function AdminMediaPage() {
   const [uploading, setUploading] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchFiles = async () => {
     try {
@@ -28,6 +29,7 @@ export default function AdminMediaPage() {
 
     setUploading(true);
     setUploadedUrl(null);
+    setErrorMessage(null);
     const formData = new FormData();
     formData.append("file", file);
 
@@ -36,7 +38,7 @@ export default function AdminMediaPage() {
       setUploadedUrl(res.url);
       fetchFiles();
     } catch (err: any) {
-      alert("Failed to upload image: " + err.message);
+      setErrorMessage(err.message || "Failed to upload image.");
     } finally {
       setUploading(false);
       // Reset input
@@ -61,6 +63,23 @@ export default function AdminMediaPage() {
           </p>
         </div>
       </div>
+
+      {errorMessage && (
+        <div className="p-4 bg-red-50 border-2 border-red-300 rounded-xl text-xs font-bold text-red-800 flex items-start justify-between gap-3 shadow-xs">
+          <div className="flex items-start gap-2">
+            <span className="text-base leading-none">⚠️</span>
+            <div className="flex flex-col gap-1">
+              <span>{errorMessage}</span>
+            </div>
+          </div>
+          <button
+            onClick={() => setErrorMessage(null)}
+            className="text-red-500 hover:text-red-800 text-sm font-bold cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Upload Zone */}
       <div className="bg-white border-4 border-dashed border-[var(--color-brand-border)] rounded-xl p-8 flex flex-col items-center justify-center text-center gap-4 shadow-sm">

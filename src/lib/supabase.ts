@@ -1,10 +1,13 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const rawSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const rawSupabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim().replace(/^["']|["']$/g, "");
 // Automatically strip trailing /rest/v1 or trailing slash if user copied from API dashboard
-export const supabaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, "");
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+export const supabaseUrl = rawSupabaseUrl
+  .replace(/\/+$/, "")
+  .replace(/\/rest\/v1\/?$/, "")
+  .replace(/\/+$/, "");
+const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim().replace(/^["']|["']$/g, "");
+const supabaseServiceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim().replace(/^["']|["']$/g, "");
 
 /**
  * Validates whether Supabase environment variables are properly configured.
@@ -15,6 +18,18 @@ export function isSupabaseConfigured(): boolean {
     supabaseUrl.startsWith("http") &&
     supabaseAnonKey &&
     supabaseAnonKey.length > 5
+  );
+}
+
+/**
+ * Checks whether the server-side SUPABASE_SERVICE_ROLE_KEY is configured.
+ * This key is required for admin operations to bypass Supabase Row Level Security (RLS).
+ */
+export function isSupabaseServiceRoleConfigured(): boolean {
+  return Boolean(
+    supabaseServiceKey &&
+    supabaseServiceKey.length > 10 &&
+    !supabaseServiceKey.includes("placeholder")
   );
 }
 

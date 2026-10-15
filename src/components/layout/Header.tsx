@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
     { label: "Home", href: "/" },
@@ -18,7 +19,13 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
+    const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // Hide Header on all admin routes
+    if (pathname?.startsWith("/admin")) {
+        return null;
+    }
 
     return (
         <header className="sticky top-0 z-50 w-full bg-[var(--color-background)] border-b-2 border-b-[var(--color-brand-border)] p-4 shadow-sm">

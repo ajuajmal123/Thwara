@@ -91,8 +91,8 @@ export default function AdminAuthorsPage() {
 
       {/* Modal */}
       {isModalOpen && editingAuthor && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white border-4 border-[var(--color-brand-border)] rounded-xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-5">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white border-4 border-[var(--color-brand-border)] rounded-xl max-w-lg w-full p-5 sm:p-6 my-auto max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col gap-5">
             <div className="flex items-center justify-between border-b pb-3">
               <h2 className="text-base font-bold text-black">
                 {editingAuthor.id ? "Edit Author Profile" : "Add New Author"}

@@ -1,15 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAdminArticles, saveArticleAction, deleteArticleAction } from "../../actions";
+import Link from "next/link";
+import { getAdminArticles, saveArticleAction, deleteArticleAction, getAdminAuthors } from "../../actions";
+import { generateSlug } from "@/lib/slug";
+import RichBodyEditor from "@/components/admin/RichBodyEditor";
+import AdditionalImagesInput from "@/components/admin/AdditionalImagesInput";
 
 export default function AdminArticlesPage() {
   const [articles, setArticles] = useState<any[]>([]);
+  const [authors, setAuthors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingArticle, setEditingArticle] = useState<any | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  // Form states
+  const [title, setTitle] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [domain, setDomain] = useState("Literature");
+  const [date, setDate] = useState("");
+  const [coverImage, setCoverImage] = useState("");
+  const [additionalImages, setAdditionalImages] = useState<string[]>([]);
+  const [content, setContent] = useState("");
 
   const DOMAINS = [
     "Literature",
@@ -24,11 +38,15 @@ export default function AdminArticlesPage() {
     "Memoir",
   ];
 
-  const fetchArticles = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const data = await getAdminArticles();
-      setArticles(data);
+      const [articlesData, authorsData] = await Promise.all([
+        getAdminArticles(),
+        getAdminAuthors(),
+      ]);
+      setArticles(articlesData);
+      setAuthors(authorsData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -37,25 +55,30 @@ export default function AdminArticlesPage() {
   };
 
   useEffect(() => {
-    fetchArticles();
+    fetchData();
   }, []);
 
   const handleOpenCreate = () => {
-    setEditingArticle({
-      title: "",
-      slug: "",
-      author_name: "Thwara Editorial",
-      domain: "Literature",
-      date: new Date().toISOString().split("T")[0],
-      subheading: "",
-      cover_image: "",
-      content: "",
-    });
+    setEditingArticle({ id: undefined });
+    setTitle("");
+    setAuthorName(authors[0]?.name || "");
+    setDomain("Literature");
+    setDate(new Date().toISOString().split("T")[0]);
+    setCoverImage("");
+    setAdditionalImages([]);
+    setContent("");
     setIsFormOpen(true);
   };
 
   const handleOpenEdit = (art: any) => {
     setEditingArticle(art);
+    setTitle(art.title || "");
+    setAuthorName(art.author_name || (authors[0]?.name || ""));
+    setDomain(art.domain || "Literature");
+    setDate(art.date ? art.date.slice(0, 10) : new Date().toISOString().split("T")[0]);
+    setCoverImage(art.cover_image || "");
+    setAdditionalImages(Array.isArray(art.additional_images) ? art.additional_images : []);
+    setContent(art.content || "");
     setIsFormOpen(true);
   };
 
@@ -64,7 +87,7 @@ export default function AdminArticlesPage() {
     try {
       await deleteArticleAction(id);
       setMessage("Article deleted successfully.");
-      fetchArticles();
+      fetchData();
     } catch (err: any) {
       alert("Failed to delete: " + err.message);
     }
@@ -72,20 +95,27 @@ export default function AdminArticlesPage() {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!title.trim()) {
+      alert("Please enter an article title.");
+      return;
+    }
+    if (!authorName) {
+      alert("Please select an author.");
+      return;
+    }
+
     setSubmitting(true);
     setMessage(null);
 
-    const formData = new FormData(e.currentTarget);
     const payload = {
       id: editingArticle?.id || undefined,
-      title: formData.get("title") as string,
-      slug: formData.get("slug") as string,
-      author_name: formData.get("author_name") as string,
-      domain: formData.get("domain") as string,
-      date: formData.get("date") as string,
-      subheading: formData.get("subheading") as string,
-      cover_image: formData.get("cover_image") as string,
-      content: formData.get("content") as string,
+      title: title.trim(),
+      author_name: authorName,
+      domain,
+      date,
+      cover_image: coverImage.trim() || null,
+      additional_images: additionalImages,
+      content,
     };
 
     try {
@@ -93,13 +123,16 @@ export default function AdminArticlesPage() {
       setMessage(editingArticle?.id ? "Article updated successfully!" : "Article published successfully!");
       setIsFormOpen(false);
       setEditingArticle(null);
-      fetchArticles();
+      fetchData();
     } catch (err: any) {
       alert("Error saving article: " + err.message);
     } finally {
       setSubmitting(false);
     }
   };
+
+  const generatedSlug = generateSlug(title);
+  const selectedAuthorObj = authors.find((a) => a.name === authorName);
 
   return (
     <div className="flex flex-col gap-6">
@@ -121,18 +154,23 @@ export default function AdminArticlesPage() {
       {message && (
         <div className="p-3 bg-emerald-50 border-2 border-emerald-300 text-emerald-800 text-xs font-bold rounded-lg flex items-center justify-between">
           <span>✓ {message}</span>
-          <button onClick={() => setMessage(null)} className="text-emerald-600 hover:text-emerald-900">✕</button>
+          <button onClick={() => setMessage(null)} className="text-emerald-600 hover:text-emerald-900 cursor-pointer">✕</button>
         </div>
       )}
 
       {/* Editor Modal / Form */}
-      {isFormOpen && editingArticle && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border-4 border-[var(--color-brand-border)] rounded-xl max-w-3xl w-full p-6 sm:p-8 my-8 shadow-2xl flex flex-col gap-5">
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white border-4 border-[var(--color-brand-border)] rounded-xl max-w-4xl w-full p-5 sm:p-8 my-auto max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col gap-5">
             <div className="flex items-center justify-between border-b-2 border-neutral-200 pb-3">
-              <h2 className="text-lg font-bold text-black">
-                {editingArticle.id ? `Edit Article #${editingArticle.id}` : "Publish New Article"}
-              </h2>
+              <div>
+                <h2 className="text-lg font-bold text-black">
+                  {editingArticle?.id ? `Edit Article #${editingArticle.id}` : "Publish New Article"}
+                </h2>
+                <span className="text-[11px] text-neutral-500 font-medium">
+                  Slug will automatically match the title. Select author from the registered authors directory.
+                </span>
+              </div>
               <button
                 onClick={() => setIsFormOpen(false)}
                 className="text-neutral-400 hover:text-black font-bold text-lg cursor-pointer"
@@ -141,52 +179,84 @@ export default function AdminArticlesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 text-xs font-bold">
-              {/* Title & Slug */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-neutral-700 uppercase mb-1">Article Title *</label>
-                  <input
-                    type="text"
-                    name="title"
-                    required
-                    defaultValue={editingArticle.title}
-                    placeholder="e.g. Who Gets to Remember a City?"
-                    className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-neutral-700 uppercase mb-1">URL Slug (Optional)</label>
-                  <input
-                    type="text"
-                    name="slug"
-                    defaultValue={editingArticle.slug}
-                    placeholder="e.g. who-gets-to-remember-a-city"
-                    className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none font-mono"
-                  />
+            <form onSubmit={handleFormSubmit} className="flex flex-col gap-5 text-xs font-bold">
+              {/* 1. Article Title & Automatic Slug Preview */}
+              <div>
+                <label className="block text-neutral-700 uppercase mb-1">Article Title *</label>
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Who Gets to Remember a City?"
+                  className="w-full px-3.5 py-2.5 border-2 border-neutral-300 rounded-lg font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
+                />
+                <div className="mt-1.5 flex items-center gap-2 text-[11px] font-mono text-neutral-500 bg-neutral-50 px-2.5 py-1 rounded border border-neutral-200">
+                  <span className="font-sans font-bold text-neutral-700">Auto Slug:</span>
+                  <span className="text-[var(--color-brand-red)] truncate">/articles/{generatedSlug}</span>
                 </div>
               </div>
 
-              {/* Author, Domain, Date */}
+              {/* 2. Author Selection from Authors Data & Domain & Date */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-neutral-700 uppercase mb-1">Author Name *</label>
-                  <input
-                    type="text"
-                    name="author_name"
-                    required
-                    defaultValue={editingArticle.author_name}
-                    placeholder="e.g. Ananya Menon"
-                    className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-neutral-700 uppercase">Author *</label>
+                    <Link
+                      href="/admin/authors"
+                      target="_blank"
+                      className="text-[10px] text-[var(--color-brand-red)] hover:underline font-bold"
+                    >
+                      + Manage Authors
+                    </Link>
+                  </div>
+
+                  {authors.length === 0 ? (
+                    <div className="p-2.5 bg-amber-50 border border-amber-300 rounded text-amber-900 text-xs">
+                      No authors found.{" "}
+                      <Link href="/admin/authors" target="_blank" className="font-bold underline">
+                        Add an Author first ↗
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <select
+                        required
+                        value={authorName}
+                        onChange={(e) => setAuthorName(e.target.value)}
+                        className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none bg-white cursor-pointer"
+                      >
+                        <option value="">-- Choose Author from Directory --</option>
+                        {authors.map((a) => (
+                          <option key={a.id} value={a.name}>
+                            {a.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {selectedAuthorObj && (
+                    <div className="mt-2 flex items-center gap-2 text-[11px] text-neutral-600 bg-neutral-50 p-1.5 rounded border border-neutral-200">
+                      {selectedAuthorObj.photo ? (
+                        <img
+                          src={selectedAuthorObj.photo}
+                          alt=""
+                          className="w-6 h-6 rounded-full object-cover border"
+                        />
+                      ) : (
+                        <span className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center text-[10px]">👤</span>
+                      )}
+                      <span className="font-bold truncate">{selectedAuthorObj.name}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-neutral-700 uppercase mb-1">Domain / Category</label>
                   <select
-                    name="domain"
-                    defaultValue={editingArticle.domain || "Literature"}
+                    value={domain}
+                    onChange={(e) => setDomain(e.target.value)}
                     className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none bg-white"
                   >
                     {DOMAINS.map((d) => (
@@ -201,50 +271,48 @@ export default function AdminArticlesPage() {
                   <label className="block text-neutral-700 uppercase mb-1">Publication Date</label>
                   <input
                     type="date"
-                    name="date"
-                    defaultValue={editingArticle.date?.slice(0, 10)}
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
                     className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
                   />
                 </div>
               </div>
 
-              {/* Cover Image URL */}
+              {/* 3. Cover Image */}
               <div>
-                <label className="block text-neutral-700 uppercase mb-1">Cover Image URL</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    name="cover_image"
-                    defaultValue={editingArticle.cover_image}
-                    placeholder="https://... or /mock-1.svg (upload image in Media Library)"
-                    className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
-                  />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-neutral-700 uppercase">Cover Image URL</label>
+                  <Link
+                    href="/admin/media"
+                    target="_blank"
+                    className="text-[11px] text-[var(--color-brand-red)] hover:underline font-bold"
+                  >
+                    Upload in Media Library ↗
+                  </Link>
                 </div>
-              </div>
-
-              {/* Subheading */}
-              <div>
-                <label className="block text-neutral-700 uppercase mb-1">Subheading / Excerpt</label>
-                <textarea
-                  name="subheading"
-                  rows={2}
-                  defaultValue={editingArticle.subheading}
-                  placeholder="Brief synopsis appearing on article cards..."
+                <input
+                  type="text"
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  placeholder="https://... or uploaded image link from Media Library"
                   className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
                 />
               </div>
 
-              {/* Content */}
-              <div>
-                <label className="block text-neutral-700 uppercase mb-1">Full Article Body</label>
-                <textarea
-                  name="content"
-                  rows={8}
-                  defaultValue={editingArticle.content}
-                  placeholder="Type or paste the complete article text here..."
-                  className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none font-serif leading-relaxed"
-                />
-              </div>
+              {/* 4. Additional Images Field */}
+              <AdditionalImagesInput
+                images={additionalImages}
+                onChange={setAdditionalImages}
+                label="Additional Images / Gallery"
+              />
+
+              {/* 5. Full Article Body (with Headings, Subheadings & Live Preview) */}
+              <RichBodyEditor
+                value={content}
+                onChange={setContent}
+                label="Full Article Body (Includes Headings, Subheadings & Text)"
+                placeholder="Write your article here. Use the buttons above to insert ## H2 Headings, ### H3 Subheadings, blockquotes, images, or body paragraphs..."
+              />
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-200">
@@ -258,9 +326,9 @@ export default function AdminArticlesPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2 bg-[var(--color-brand-red)] hover:bg-[#520e0e] text-white rounded font-bold transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2.5 bg-[var(--color-brand-red)] hover:bg-[#520e0e] text-white rounded font-bold transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  {submitting ? "Saving..." : editingArticle.id ? "Save Changes" : "Publish Article"}
+                  {submitting ? "Saving..." : editingArticle?.id ? "Save Changes" : "Publish Article"}
                 </button>
               </div>
             </form>
@@ -280,13 +348,18 @@ export default function AdminArticlesPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+            <div className="sm:hidden px-3 py-1.5 bg-neutral-50 text-[11px] text-neutral-500 border-b border-neutral-200 flex items-center gap-1.5 font-medium">
+              <span>⟷</span>
+              <span>Swipe horizontally to view all columns</span>
+            </div>
+            <table className="w-full min-w-[700px] text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-neutral-50 border-b-2 border-neutral-200 text-neutral-600 uppercase tracking-wider font-bold">
                   <th className="p-3.5">Cover</th>
-                  <th className="p-3.5">Title</th>
+                  <th className="p-3.5">Title & Slug</th>
                   <th className="p-3.5">Author</th>
                   <th className="p-3.5">Domain</th>
+                  <th className="p-3.5">Images</th>
                   <th className="p-3.5">Date</th>
                   <th className="p-3.5 text-right">Actions</th>
                 </tr>
@@ -309,13 +382,24 @@ export default function AdminArticlesPage() {
                     </td>
                     <td className="p-3 font-bold text-neutral-900 max-w-xs truncate">
                       {art.title}
-                      {art.slug && <span className="block text-[10px] text-neutral-400 font-mono font-normal">/{art.slug}</span>}
+                      <span className="block text-[10px] text-neutral-400 font-mono font-normal">
+                        /articles/{art.slug}
+                      </span>
                     </td>
                     <td className="p-3 text-neutral-700">{art.author_name}</td>
                     <td className="p-3">
                       <span className="bg-neutral-100 border border-neutral-300 text-neutral-700 px-2 py-0.5 rounded text-[10px] font-bold">
                         {art.domain || "Article"}
                       </span>
+                    </td>
+                    <td className="p-3 text-neutral-500">
+                      {Array.isArray(art.additional_images) && art.additional_images.length > 0 ? (
+                        <span className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">
+                          +{art.additional_images.length} images
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-neutral-400">Cover only</span>
+                      )}
                     </td>
                     <td className="p-3 text-neutral-500 whitespace-nowrap">{art.date}</td>
                     <td className="p-3 text-right whitespace-nowrap space-x-2">
