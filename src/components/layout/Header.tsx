@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const NAV_LINKS = [
     { label: "Home", href: "/" },
@@ -20,12 +20,21 @@ const NAV_LINKS = [
 
 export default function Header() {
     const pathname = usePathname();
+    const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     // Hide Header on all admin routes
     if (pathname?.startsWith("/admin")) {
         return null;
     }
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        const trimmed = searchQuery.trim();
+        if (!trimmed) return;
+        router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+    };
 
     return (
         <header className="sticky top-0 z-50 w-full bg-[var(--color-background)] border-b-2 border-b-[var(--color-brand-border)] p-4 shadow-sm">
@@ -60,19 +69,21 @@ export default function Header() {
 
                 {/* Center: Search Bar */}
                 <div className="flex items-center justify-center mx-4">
-                    <div className="relative border-2 border-[var(--color-brand-border)] rounded-md flex items-center bg-white">
+                    <form onSubmit={handleSearch} className="relative border-2 border-[var(--color-brand-border)] rounded-md flex items-center bg-white">
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search..."
                             className="bg-transparent border-none outline-none py-1 px-3 text-sm text-black placeholder:text-gray-400 focus:ring-0 w-24 xl:w-28 2xl:w-48"
                         />
-                        <button aria-label="Search" className="px-3 text-[var(--color-brand-red)]">
+                        <button type="submit" aria-label="Search" className="px-3 text-[var(--color-brand-red)] cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
                         </button>
-                    </div>
+                    </form>
                 </div>
 
                 {/* Right: Actions / Logo */}

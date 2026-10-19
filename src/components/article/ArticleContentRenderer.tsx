@@ -24,14 +24,14 @@ export default function ArticleContentRenderer({
     return parts.map((part, i) => {
       if (part.startsWith("**") && part.endsWith("**")) {
         return (
-          <strong key={i} className="font-bold text-black">
+          <strong key={i} className="font-bold text-black break-words [overflow-wrap:anywhere]">
             {part.slice(2, -2)}
           </strong>
         );
       }
       if (part.startsWith("*") && part.endsWith("*")) {
         return (
-          <em key={i} className="italic text-neutral-800">
+          <em key={i} className="italic text-neutral-800 break-words [overflow-wrap:anywhere]">
             {part.slice(1, -1)}
           </em>
         );
@@ -44,7 +44,7 @@ export default function ArticleContentRenderer({
             href={linkMatch[2]}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[var(--color-brand-red)] underline hover:text-[#520e0e]"
+            className="text-[var(--color-brand-red)] underline hover:text-[#520e0e] break-all [overflow-wrap:anywhere]"
           >
             {linkMatch[1]}
           </a>
@@ -74,7 +74,7 @@ export default function ArticleContentRenderer({
         elements.push(
           <p
             key={`p-${keyIndex}`}
-            className={`text-neutral-900 leading-[1.8] sm:leading-[2] mb-6 text-base sm:text-lg ${
+            className={`text-neutral-900 leading-[1.8] sm:leading-[2] mb-6 text-base sm:text-lg break-words [overflow-wrap:anywhere] ${
               isMalayalam ? "font-sans leading-relaxed" : "font-serif"
             }`}
           >
@@ -94,7 +94,7 @@ export default function ArticleContentRenderer({
         elements.push(
           <h1
             key={`h1-${index}`}
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mt-10 mb-4 font-sans tracking-tight border-b-2 border-neutral-200 pb-2"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mt-10 mb-4 font-sans tracking-tight border-b-2 border-neutral-200 pb-2 break-words [overflow-wrap:anywhere]"
           >
             {trimmed.replace(/^#\s+/, "")}
           </h1>
@@ -106,10 +106,10 @@ export default function ArticleContentRenderer({
         elements.push(
           <h2
             key={`h2-${index}`}
-            className="text-xl sm:text-2xl lg:text-3xl font-bold text-black mt-10 mb-4 font-sans tracking-tight text-[var(--color-brand-red)] flex items-center gap-2"
+            className="text-xl sm:text-2xl lg:text-3xl font-bold text-black mt-10 mb-4 font-sans tracking-tight text-[var(--color-brand-red)] flex items-start gap-2.5 break-words [overflow-wrap:anywhere]"
           >
-            <span className="w-2 h-2 rounded-full bg-[var(--color-brand-red)] inline-block shrink-0" />
-            <span>{trimmed.replace(/^##\s+/, "")}</span>
+            <span className="w-2 h-2 rounded-full bg-[var(--color-brand-red)] inline-block shrink-0 mt-2.5" />
+            <span className="min-w-0 flex-1 break-words [overflow-wrap:anywhere]">{trimmed.replace(/^##\s+/, "")}</span>
           </h2>
         );
       }
@@ -119,7 +119,7 @@ export default function ArticleContentRenderer({
         elements.push(
           <h3
             key={`h3-${index}`}
-            className="text-lg sm:text-xl font-bold text-neutral-800 mt-8 mb-3 font-sans tracking-tight"
+            className="text-lg sm:text-xl font-bold text-neutral-800 mt-8 mb-3 font-sans tracking-tight break-words [overflow-wrap:anywhere]"
           >
             {trimmed.replace(/^###\s+/, "")}
           </h3>
@@ -131,7 +131,7 @@ export default function ArticleContentRenderer({
         elements.push(
           <blockquote
             key={`quote-${index}`}
-            className="border-l-4 border-[var(--color-brand-green)] pl-5 py-2 my-6 italic text-neutral-800 bg-neutral-50/80 rounded-r-lg text-base sm:text-lg font-serif"
+            className="border-l-4 border-[var(--color-brand-green)] pl-4 sm:pl-5 py-2 my-6 italic text-neutral-800 bg-neutral-50/80 rounded-r-lg text-base sm:text-lg font-serif break-words [overflow-wrap:anywhere]"
           >
             {formatInline(trimmed.replace(/^>\s+/, ""))}
           </blockquote>
@@ -145,15 +145,15 @@ export default function ArticleContentRenderer({
           const caption = match[1];
           const imgUrl = match[2];
           elements.push(
-            <figure key={`img-${index}`} className="my-8 flex flex-col items-center">
+            <figure key={`img-${index}`} className="my-8 flex flex-col items-center w-full max-w-full overflow-hidden">
               <img
                 src={imgUrl}
                 alt={caption || "Embedded image"}
-                className="w-full max-h-[550px] object-cover rounded-lg border-2 border-[var(--color-brand-border)] shadow-sm cursor-pointer hover:opacity-95 transition-opacity"
+                className="w-full max-w-full h-auto max-h-[550px] object-cover rounded-lg border-2 border-[var(--color-brand-border)] shadow-sm cursor-pointer hover:opacity-95 transition-opacity"
                 onClick={() => setActiveModalImage(imgUrl)}
               />
               {caption && (
-                <figcaption className="text-xs text-neutral-500 mt-2 italic text-center">
+                <figcaption className="text-xs text-neutral-500 mt-2 italic text-center break-words [overflow-wrap:anywhere] max-w-full">
                   {caption}
                 </figcaption>
               )}
@@ -167,7 +167,7 @@ export default function ArticleContentRenderer({
         elements.push(
           <li
             key={`li-${index}`}
-            className="ml-6 list-disc text-base sm:text-lg text-neutral-900 my-1.5 font-serif"
+            className="ml-6 list-disc text-base sm:text-lg text-neutral-900 my-1.5 font-serif break-words [overflow-wrap:anywhere]"
           >
             {formatInline(trimmed.replace(/^[-*]\s+/, ""))}
           </li>
@@ -190,16 +190,16 @@ export default function ArticleContentRenderer({
     : [];
 
   return (
-    <div className="w-full flex flex-col gap-8">
+    <div className="w-full max-w-full overflow-hidden flex flex-col gap-6 sm:gap-8">
       {/* Article Body */}
-      <div className="prose max-w-none text-neutral-900 leading-relaxed">
+      <div className="w-full max-w-full break-words [overflow-wrap:anywhere] text-neutral-900 leading-relaxed overflow-hidden">
         {renderMarkdown()}
       </div>
 
       {/* Additional Images / Visual Gallery */}
       {imagesList.length > 0 && (
-        <section className="mt-8 pt-8 border-t-2 border-[var(--color-brand-border)] flex flex-col gap-4">
-          <div className="flex items-center justify-between">
+        <section className="mt-8 pt-8 border-t-2 border-[var(--color-brand-border)] flex flex-col gap-4 max-w-full overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-base sm:text-lg font-bold text-black uppercase tracking-wider flex items-center gap-2">
               <span>🖼️</span>
               <span>Visual Archive & Additional Images ({imagesList.length})</span>
@@ -207,7 +207,7 @@ export default function ArticleContentRenderer({
             <span className="text-[11px] text-neutral-500 font-medium">Click to enlarge</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-full overflow-hidden">
             {imagesList.map((imgUrl, idx) => (
               <div
                 key={`gallery-${idx}`}
@@ -231,11 +231,11 @@ export default function ArticleContentRenderer({
 
       {/* Archival Reference / Notes */}
       {reference && reference.trim() && (
-        <section className="mt-6 p-4 bg-neutral-50 border-2 border-dashed border-neutral-300 rounded-lg text-xs flex flex-col gap-1.5">
+        <section className="mt-6 p-4 bg-neutral-50 border-2 border-dashed border-neutral-300 rounded-lg text-xs flex flex-col gap-1.5 max-w-full overflow-hidden">
           <span className="font-bold uppercase tracking-wider text-neutral-700">
             Notes & References
           </span>
-          <p className="text-neutral-600 whitespace-pre-line leading-relaxed">
+          <p className="text-neutral-600 whitespace-pre-line leading-relaxed break-words [overflow-wrap:anywhere]">
             {reference}
           </p>
         </section>

@@ -6,6 +6,7 @@ import { getAdminArticles, saveArticleAction, deleteArticleAction, getAdminAutho
 import { generateSlug } from "@/lib/slug";
 import RichBodyEditor from "@/components/admin/RichBodyEditor";
 import AdditionalImagesInput from "@/components/admin/AdditionalImagesInput";
+import DirectMediaUpload from "@/components/admin/DirectMediaUpload";
 
 export default function AdminArticlesPage() {
   const [articles, setArticles] = useState<any[]>([]);
@@ -278,26 +279,14 @@ export default function AdminArticlesPage() {
                 </div>
               </div>
 
-              {/* 3. Cover Image */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-neutral-700 uppercase">Cover Image URL</label>
-                  <Link
-                    href="/admin/media"
-                    target="_blank"
-                    className="text-[11px] text-[var(--color-brand-red)] hover:underline font-bold"
-                  >
-                    Upload in Media Library ↗
-                  </Link>
-                </div>
-                <input
-                  type="text"
-                  value={coverImage}
-                  onChange={(e) => setCoverImage(e.target.value)}
-                  placeholder="https://... or uploaded image link from Media Library"
-                  className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
-                />
-              </div>
+              {/* 3. Cover Image (Direct Upload & Picker) */}
+              <DirectMediaUpload
+                label="Cover Image"
+                value={coverImage}
+                onChange={setCoverImage}
+                type="image"
+                helpText="Directly upload cover photo, select from library, or paste image URL."
+              />
 
               {/* 4. Additional Images Field */}
               <AdditionalImagesInput

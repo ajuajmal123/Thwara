@@ -91,10 +91,10 @@ export default function ArticlesPage() {
       : items.filter((item) => item.category === activeCategory);
 
   return (
-    <main className="w-full max-w-[1400px] mx-auto px-4 py-8 flex flex-col bg-white">
-      <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-6 sm:p-10 bg-white flex flex-col gap-8">
+    <main className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-6 sm:py-8 flex flex-col bg-white overflow-hidden">
+      <section className="border-2 sm:border-4 border-[var(--color-brand-border)] rounded-lg p-4 sm:p-8 md:p-10 bg-white flex flex-col gap-6 sm:gap-8 max-w-full overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-2 border-[var(--color-brand-border)] pb-4">
-          <h1 className="text-3xl md:text-5xl font-bold text-black uppercase">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-black uppercase break-words">
             Articles & Essays
           </h1>
         </div>
@@ -120,9 +120,9 @@ export default function ArticlesPage() {
           {filteredItems.map((item) => (
             <article
               key={item.id}
-              className="flex flex-col border-2 border-[var(--color-brand-border)] rounded p-4 group bg-white shadow-sm hover:shadow-md transition-shadow justify-between"
+              className="flex flex-col border-2 border-[var(--color-brand-border)] rounded p-4 group bg-white shadow-sm hover:shadow-md transition-shadow justify-between max-w-full overflow-hidden"
             >
-              <div>
+              <div className="min-w-0">
                 <Link href={`/articles/${item.slug}`} className="block overflow-hidden rounded mb-4">
                   <img
                     src={item.coverImage}
@@ -134,12 +134,12 @@ export default function ArticlesPage() {
                 <span className="text-[var(--color-brand-red)] font-bold text-xs uppercase mb-1 block">
                   {item.category}
                 </span>
-                <Link href={`/articles/${item.slug}`} className="block">
-                  <h2 className="text-xl font-bold text-black mb-2 leading-tight line-clamp-2 group-hover:text-[var(--color-brand-red)] transition-colors">
+                <Link href={`/articles/${item.slug}`} className="block min-w-0">
+                  <h2 className="text-xl font-bold text-black mb-2 leading-tight line-clamp-2 group-hover:text-[var(--color-brand-red)] transition-colors break-words [overflow-wrap:anywhere]">
                     {item.title}
                   </h2>
                 </Link>
-                <p className="text-black text-sm mb-4 line-clamp-3 leading-relaxed">
+                <p className="text-black text-sm mb-4 line-clamp-3 leading-relaxed break-words [overflow-wrap:anywhere]">
                   {item.snippet}
                 </p>
               </div>

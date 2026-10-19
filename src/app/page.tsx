@@ -210,7 +210,7 @@ export default function Home() {
               <Link
                 key={item.id}
                 href={`/articles/${item.slug}`}
-                className="flex flex-col md:flex-row gap-4 border-2 border-[var(--color-brand-border)] rounded p-3 group hover:shadow-md transition-shadow bg-white"
+                className="flex flex-col md:flex-row gap-4 border-2 border-[var(--color-brand-border)] rounded p-3 group hover:shadow-md transition-shadow bg-white overflow-hidden"
               >
                 {item.coverImage ? (
                   <img src={item.coverImage} alt={item.title} className="md:w-1/4 aspect-video object-cover rounded border-2 border-[var(--color-brand-border)] shrink-0" loading="lazy" />
@@ -219,11 +219,11 @@ export default function Home() {
                     <span className="text-3xl text-[var(--color-brand-red)]">✦</span>
                   </div>
                 )}
-                <div className="flex flex-col gap-2 justify-center text-left">
+                <div className="flex flex-col gap-2 justify-center text-left min-w-0 flex-1 overflow-hidden">
                   <span className="text-[var(--color-brand-red)] font-bold text-xs uppercase">{item.category}</span>
-                  <h3 className="text-xl font-bold text-black group-hover:text-[var(--color-brand-red)] transition-colors leading-tight">{item.title}</h3>
-                  <div className="flex items-center gap-3 text-black text-xs">
-                    <span className="font-bold">{item.author}</span>
+                  <h3 className="text-xl font-bold text-black group-hover:text-[var(--color-brand-red)] transition-colors leading-tight break-words [overflow-wrap:anywhere]">{item.title}</h3>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-black text-xs">
+                    <span className="font-bold truncate max-w-[200px]">{item.author}</span>
                     <span className="text-[var(--color-brand-red)] font-bold group-hover:underline">Read Article →</span>
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export default function Home() {
             <ComingSoon label="Webzine Issues" />
           ) : (
             webzines.map((item) => (
-              <Link key={item.id} href={`/webzine/${item.slug}`} className="flex flex-col gap-3 border-2 border-[var(--color-brand-border)] p-3 rounded bg-white items-center text-center group hover:shadow-md transition-all hover:-translate-y-1">
+              <Link key={item.id} href={`/webzine/${item.slug}`} className="flex flex-col gap-3 border-2 border-[var(--color-brand-border)] p-3 rounded bg-white items-center text-center group hover:shadow-md transition-all hover:-translate-y-1 overflow-hidden">
                 {item.coverImage ? (
                   <img src={item.coverImage} alt={item.title} className="w-full aspect-[3/4] object-cover rounded border-2 border-[var(--color-brand-border)]" loading="lazy" />
                 ) : (
@@ -255,7 +255,7 @@ export default function Home() {
                   </div>
                 )}
                 <span className="text-[var(--color-brand-red)] font-bold text-[10px] uppercase tracking-widest">{item.category}</span>
-                <h3 className="text-lg font-bold text-black group-hover:text-[var(--color-brand-red)] transition-colors line-clamp-1">{item.title}</h3>
+                <h3 className="text-lg font-bold text-black group-hover:text-[var(--color-brand-red)] transition-colors line-clamp-1 break-words [overflow-wrap:anywhere]">{item.title}</h3>
                 <p className="text-xs text-neutral-500 font-medium">{item.date}</p>
                 <span className="border-2 border-[var(--color-brand-red)] text-black py-1 px-4 rounded text-sm font-bold group-hover:bg-[var(--color-brand-red)] group-hover:text-white transition-colors uppercase">READ NOW</span>
               </Link>
@@ -277,13 +277,13 @@ export default function Home() {
             <ComingSoon label="Fiction & Stories" />
           ) : (
             fictions.map((item) => (
-              <Link key={item.id} href={`/fiction/${item.slug}`} className="flex border-2 border-[var(--color-brand-border)] p-3 rounded bg-white items-center gap-4 group hover:shadow-md transition-shadow">
+              <Link key={item.id} href={`/fiction/${item.slug}`} className="flex border-2 border-[var(--color-brand-border)] p-3 rounded bg-white items-center gap-4 group hover:shadow-md transition-shadow overflow-hidden">
                 <div className="w-14 h-14 rounded-full bg-neutral-100 border-2 border-[var(--color-brand-border)] shrink-0 flex items-center justify-center">
                   <span className="text-2xl text-[var(--color-brand-red)]">✦</span>
                 </div>
-                <div className="flex flex-col gap-1 text-left">
-                  <h3 className="text-lg font-bold text-black group-hover:text-[var(--color-brand-red)] transition-colors leading-tight line-clamp-2">{item.title}</h3>
-                  <span className="text-xs text-black font-bold">{item.type} · By {item.author}</span>
+                <div className="flex flex-col gap-1 text-left min-w-0 flex-1 overflow-hidden">
+                  <h3 className="text-lg font-bold text-black group-hover:text-[var(--color-brand-red)] transition-colors leading-tight line-clamp-2 break-words [overflow-wrap:anywhere]">{item.title}</h3>
+                  <span className="text-xs text-black font-bold truncate">{item.type} · By {item.author}</span>
                   <span className="text-[var(--color-brand-red)] font-bold text-xs mt-1 flex gap-1 items-center">Read <span className="text-sm">→</span></span>
                 </div>
               </Link>
@@ -305,7 +305,7 @@ export default function Home() {
             <ComingSoon label="Folklore & Oral Studies" />
           ) : (
             folklores.map((item) => (
-              <Link key={item.id} href={`/folklore/${item.slug}`} className="flex flex-col md:flex-row gap-4 border-2 border-[var(--color-brand-border)] rounded p-3 group hover:shadow-md transition-shadow bg-white">
+              <Link key={item.id} href={`/folklore/${item.slug}`} className="flex flex-col md:flex-row gap-4 border-2 border-[var(--color-brand-border)] rounded p-3 group hover:shadow-md transition-shadow bg-white overflow-hidden">
                 {item.coverImage ? (
                   <img src={item.coverImage} alt={item.title} className="md:w-1/4 aspect-video object-cover rounded border-2 border-[var(--color-brand-border)] shrink-0" loading="lazy" />
                 ) : (
@@ -313,10 +313,10 @@ export default function Home() {
                     <span className="text-3xl text-[var(--color-brand-red)]">✦</span>
                   </div>
                 )}
-                <div className="flex flex-col gap-2 justify-center text-left w-full">
-                  <h3 className="text-xl font-bold text-black group-hover:text-[var(--color-brand-red)] transition-colors">{item.title}</h3>
-                  <div className="flex items-center gap-3 text-black text-xs">
-                    <span className="font-bold">{item.author}</span>
+                <div className="flex flex-col gap-2 justify-center text-left w-full min-w-0 flex-1 overflow-hidden">
+                  <h3 className="text-xl font-bold text-black group-hover:text-[var(--color-brand-red)] transition-colors break-words [overflow-wrap:anywhere]">{item.title}</h3>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-black text-xs">
+                    <span className="font-bold truncate max-w-[200px]">{item.author}</span>
                     <span>|</span>
                     <span className="text-[var(--color-brand-red)] font-bold group-hover:underline">Explore →</span>
                   </div>

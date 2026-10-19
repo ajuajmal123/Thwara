@@ -9,6 +9,10 @@ import {
   StrapiCollectionResponse,
   StrapiSingleResponse,
 } from "@/types/schema";
+import { ARTICLES } from "@/data/articles";
+import { CREATIVE_WORKS } from "@/data/creative";
+import { WEBZINE_PROJECTS } from "@/data/webzine";
+import { CONTRIBUTORS } from "@/data/contributors";
 
 /**
  * Normalizes Supabase database rows into an entity format compatible with both
@@ -597,4 +601,283 @@ export async function postSubmission(submissionData: FormData | any) {
   }
 
   return { success: true, data };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SEARCH
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface SearchResultItem {
+  id: string;
+  origin: "Article" | "Fiction" | "Folklore" | "Webzine" | "Telling" | "Author";
+  type?: "article" | "fiction" | "folklore" | "webzine" | "telling" | "author" | string;
+  title: string;
+  excerpt?: string;
+  author?: string;
+  date?: string;
+  category?: string;
+  coverImage?: string;
+  href: string;
+}
+
+export async function searchAllContent(rawQuery: string): Promise<SearchResultItem[]> {
+  const query = (rawQuery || "").trim();
+  if (!query) return [];
+
+  const q = query.toLowerCase();
+  const results: SearchResultItem[] = [];
+  const seenHrefs = new Set<string>();
+
+  const supabase = getSupabase();
+
+  if (supabase) {
+    try {
+      const [artRes, ficRes, folRes, webRes, telRes, autRes] = await Promise.allSettled([
+        supabase
+          .from("articles")
+          .select("id, title, author_name, domain, date, cover_image, slug, content")
+          .or(`title.ilike.%${query}%,author_name.ilike.%${query}%,domain.ilike.%${query}%,content.ilike.%${query}%`)
+          .limit(20),
+        supabase
+          .from("fictions")
+          .select("id, title, author_name, genre, date, cover_image, slug, content")
+          .or(`title.ilike.%${query}%,author_name.ilike.%${query}%,genre.ilike.%${query}%,content.ilike.%${query}%`)
+          .limit(20),
+        supabase
+          .from("folklores")
+          .select("id, title, narrator_name, category, date, cover_image, slug, content")
+          .or(`title.ilike.%${query}%,narrator_name.ilike.%${query}%,category.ilike.%${query}%,content.ilike.%${query}%`)
+          .limit(20),
+        supabase
+          .from("webzines")
+          .select("id, title, webzine_name, description, excerpt, date, domain, slug, cover_image")
+          .or(`title.ilike.%${query}%,webzine_name.ilike.%${query}%,description.ilike.%${query}%`)
+          .limit(20),
+        supabase
+          .from("tellings")
+          .select("id, title, author_name, category, notes, date, cover_image, slug")
+          .or(`title.ilike.%${query}%,author_name.ilike.%${query}%,category.ilike.%${query}%`)
+          .limit(20),
+        supabase
+          .from("authors")
+          .select("id, name, description, photo")
+          .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+          .limit(20),
+      ]);
+
+      if (artRes.status === "fulfilled" && artRes.value.data) {
+        artRes.value.data.forEach((row: any) => {
+          const href = `/articles/${row.slug || row.id}`;
+          if (!seenHrefs.has(href)) {
+            seenHrefs.add(href);
+            results.push({
+              id: `db-art-${row.id}`,
+              origin: "Article",
+              title: row.title || "Untitled Article",
+              excerpt: (row.content ? row.content.replace(/[#*`>_\[\]\(\)]/g, "").slice(0, 160) : "") || "",
+              author: row.author_name || "Thwara Editorial",
+              date: row.date ? String(row.date).slice(0, 10) : "2026",
+              category: row.domain || "Article",
+              coverImage: typeof row.cover_image === "string" ? row.cover_image : row.cover_image?.url || "",
+              href,
+            });
+          }
+        });
+      }
+
+      if (ficRes.status === "fulfilled" && ficRes.value.data) {
+        ficRes.value.data.forEach((row: any) => {
+          const href = `/fiction/${row.slug || row.id}`;
+          if (!seenHrefs.has(href)) {
+            seenHrefs.add(href);
+            results.push({
+              id: `db-fic-${row.id}`,
+              origin: "Fiction",
+              title: row.title || "Untitled Fiction",
+              excerpt: (row.content ? row.content.replace(/[#*`>_\[\]\(\)]/g, "").slice(0, 160) : "") || "",
+              author: row.author_name || "Thwara Writer",
+              date: row.date ? String(row.date).slice(0, 10) : "2026",
+              category: row.genre || "Fiction",
+              coverImage: typeof row.cover_image === "string" ? row.cover_image : row.cover_image?.url || "",
+              href,
+            });
+          }
+        });
+      }
+
+      if (folRes.status === "fulfilled" && folRes.value.data) {
+        folRes.value.data.forEach((row: any) => {
+          const href = `/folklore/${row.slug || row.id}`;
+          if (!seenHrefs.has(href)) {
+            seenHrefs.add(href);
+            results.push({
+              id: `db-fol-${row.id}`,
+              origin: "Folklore",
+              title: row.title || "Untitled Folklore",
+              excerpt: (row.content ? row.content.replace(/[#*`>_\[\]\(\)]/g, "").slice(0, 160) : "") || "",
+              author: row.narrator_name || "Thwara Archive",
+              date: row.date ? String(row.date).slice(0, 10) : "2026",
+              category: row.category || "Folklore",
+              coverImage: typeof row.cover_image === "string" ? row.cover_image : row.cover_image?.url || "",
+              href,
+            });
+          }
+        });
+      }
+
+      if (webRes.status === "fulfilled" && webRes.value.data) {
+        webRes.value.data.forEach((row: any) => {
+          const href = `/webzine/${row.slug || row.id}`;
+          if (!seenHrefs.has(href)) {
+            seenHrefs.add(href);
+            results.push({
+              id: `db-web-${row.id}`,
+              origin: "Webzine",
+              title: row.title || row.webzine_name || "Webzine Issue",
+              excerpt: row.excerpt || row.description || "",
+              author: "Thwara Collective",
+              date: row.date || "2026",
+              category: row.domain || "Webzine",
+              coverImage: typeof row.cover_image === "string" ? row.cover_image : row.cover_image?.url || "",
+              href,
+            });
+          }
+        });
+      }
+
+      if (telRes.status === "fulfilled" && telRes.value.data) {
+        telRes.value.data.forEach((row: any) => {
+          const href = `/tellings`;
+          results.push({
+            id: `db-tel-${row.id}`,
+            origin: "Telling",
+            title: row.title || "Telling Audio",
+            excerpt: row.notes || "",
+            author: row.author_name || "Thwara",
+            date: row.date || "2026",
+            category: row.category || "Audio",
+            coverImage: typeof row.cover_image === "string" ? row.cover_image : row.cover_image?.url || "",
+            href,
+          });
+        });
+      }
+
+      if (autRes.status === "fulfilled" && autRes.value.data) {
+        autRes.value.data.forEach((row: any) => {
+          const href = `/authors`;
+          results.push({
+            id: `db-aut-${row.id}`,
+            origin: "Author",
+            title: row.name || "Author",
+            excerpt: row.description || "",
+            author: row.name,
+            category: "Author Profile",
+            coverImage: row.photo || "",
+            href,
+          });
+        });
+      }
+    } catch (err) {
+      console.error("[Supabase searchAllContent error]:", err);
+    }
+  }
+
+  // Also include matching static data as fallback / augmentation
+  // Static Articles
+  ARTICLES.forEach((item) => {
+    const matches =
+      (item.title && item.title.toLowerCase().includes(q)) ||
+      (item.author && item.author.toLowerCase().includes(q)) ||
+      (item.excerpt && item.excerpt.toLowerCase().includes(q)) ||
+      (item.category && item.category.toLowerCase().includes(q));
+
+    const href = `/articles/${item.slug}`;
+    if (matches && !seenHrefs.has(href)) {
+      seenHrefs.add(href);
+      results.push({
+        id: `static-art-${item.id}`,
+        origin: "Article",
+        title: item.title,
+        excerpt: item.excerpt,
+        author: item.author,
+        date: item.date,
+        category: item.category,
+        coverImage: item.coverImage,
+        href,
+      });
+    }
+  });
+
+  // Static Creative Works -> Fiction & Folklore
+  CREATIVE_WORKS.forEach((item) => {
+    const matches =
+      (item.title && item.title.toLowerCase().includes(q)) ||
+      (item.author && item.author.toLowerCase().includes(q)) ||
+      (item.excerpt && item.excerpt.toLowerCase().includes(q)) ||
+      (item.type && item.type.toLowerCase().includes(q));
+
+    const href = `/fiction/${item.slug}`;
+    if (matches && !seenHrefs.has(href)) {
+      seenHrefs.add(href);
+      results.push({
+        id: `static-cre-${item.id}`,
+        origin: "Fiction",
+        title: item.title,
+        excerpt: item.excerpt,
+        author: item.author,
+        date: item.date,
+        category: item.type,
+        coverImage: item.coverImage,
+        href,
+      });
+    }
+  });
+
+  // Static Webzine Projects
+  WEBZINE_PROJECTS.forEach((item) => {
+    const matches =
+      (item.title && item.title.toLowerCase().includes(q)) ||
+      (Array.isArray(item.contributors) && item.contributors.some((c) => c.toLowerCase().includes(q))) ||
+      (item.excerpt && item.excerpt.toLowerCase().includes(q)) ||
+      (item.type && item.type.toLowerCase().includes(q));
+
+    const href = `/webzine/${item.slug}`;
+    if (matches && !seenHrefs.has(href)) {
+      seenHrefs.add(href);
+      results.push({
+        id: `static-web-${item.id}`,
+        origin: "Webzine",
+        title: item.title,
+        excerpt: item.excerpt,
+        author: Array.isArray(item.contributors) ? item.contributors.join(", ") : "Thwara Collective",
+        date: item.date,
+        category: item.type,
+        coverImage: item.coverImage,
+        href,
+      });
+    }
+  });
+
+  // Static Contributors
+  CONTRIBUTORS.forEach((cont) => {
+    const matches =
+      (cont.name && cont.name.toLowerCase().includes(q)) ||
+      (cont.role && cont.role.toLowerCase().includes(q)) ||
+      (cont.bio && cont.bio.toLowerCase().includes(q));
+
+    const href = `/authors`;
+    if (matches) {
+      results.push({
+        id: `static-con-${cont.id}`,
+        origin: "Author",
+        title: cont.name,
+        excerpt: cont.bio || `${cont.role} at THWARA`,
+        author: cont.name,
+        category: cont.role,
+        href,
+      });
+    }
+  });
+
+  return results;
 }

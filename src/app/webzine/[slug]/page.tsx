@@ -107,21 +107,21 @@ export default async function WebzineDetail({ params }: { params: Promise<{ slug
                         className="object-cover opacity-20 grayscale object-center scale-110 blur-xl"
                     />
                 </div>
-                <div className="relative z-10 flex flex-col items-center justify-center p-8 max-w-4xl text-center">
-                    <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-[var(--color-brand-red)] mb-8 block">
+                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-8 max-w-4xl text-center max-w-full overflow-hidden">
+                    <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-[var(--color-brand-red)] mb-6 sm:mb-8 block">
                         A {project.type}
                     </span>
                     <h1
-                        className={`font-serif text-[clamp(2.5rem,7vw,6.5rem)] leading-[0.9] tracking-tight mb-8 break-words text-[var(--color-brand-black)] ${
+                        className={`font-serif text-[clamp(2rem,6vw,6rem)] leading-[0.95] tracking-tight mb-6 sm:mb-8 break-words [overflow-wrap:anywhere] text-[var(--color-brand-black)] ${
                             isMalayalam ? "leading-normal font-sans" : ""
                         }`}
                     >
                         {project.title}
                     </h1>
-                    <p className="text-[16px] md:text-[20px] text-[var(--color-brand-gray)] max-w-2xl font-medium leading-[1.8] italic font-serif">
+                    <p className="text-[15px] sm:text-[18px] md:text-[20px] text-[var(--color-brand-gray)] max-w-2xl font-medium leading-[1.8] italic font-serif break-words [overflow-wrap:anywhere]">
                         {project.excerpt}
                     </p>
-                    <div className="flex gap-4 mt-12 text-[10px] font-semibold uppercase tracking-[0.25em] text-[var(--color-brand-black)]">
+                    <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-8 sm:mt-12 text-[10px] font-semibold uppercase tracking-[0.25em] text-[var(--color-brand-black)]">
                         <span>{project.date}</span>
                         <span className="text-[var(--color-brand-gray)]">/</span>
                         <span className="text-[var(--color-brand-red)]">
@@ -223,27 +223,27 @@ export default async function WebzineDetail({ params }: { params: Promise<{ slug
             )}
 
             {/* Episodic Scroller Layout */}
-            <section className="flex flex-col w-full px-4 sm:px-8 lg:px-24 py-24 sm:py-32 gap-32 sm:gap-40 max-w-[1400px] mx-auto bg-white">
+            <section className="flex flex-col w-full px-4 sm:px-8 lg:px-24 py-16 sm:py-24 lg:py-32 gap-16 sm:gap-28 lg:gap-40 max-w-[1400px] mx-auto bg-white overflow-hidden">
                 {episodes.map((ep, i) => (
-                    <div key={i} className="flex flex-col md:flex-row items-center w-full group">
+                    <div key={i} className="flex flex-col md:flex-row items-center w-full group overflow-hidden">
                         {/* Number & Text */}
                         <div
-                            className={`w-full md:w-1/2 flex flex-col p-8 sm:p-12 ${
+                            className={`w-full md:w-1/2 flex flex-col p-4 sm:p-8 md:p-12 overflow-hidden ${
                                 i % 2 === 0
-                                    ? "md:pr-24 lg:pr-32 items-end text-right order-2 md:order-1"
-                                    : "md:pl-24 lg:pl-32 items-start order-2 md:order-2"
+                                    ? "md:pr-16 lg:pr-32 md:items-end md:text-right order-2 md:order-1 text-left"
+                                    : "md:pl-16 lg:pl-32 items-start order-2 md:order-2 text-left"
                             }`}
                         >
-                            <span className="font-serif text-[6rem] sm:text-[8rem] lg:text-[10rem] leading-[0.7] text-neutral-200 group-hover:text-[var(--color-brand-red)] transition-colors">
+                            <span className="font-serif text-[4.5rem] sm:text-[7rem] lg:text-[10rem] leading-[0.7] text-neutral-200 group-hover:text-[var(--color-brand-red)] transition-colors">
                                 {String(i + 1).padStart(2, "0")}
                             </span>
-                            <div className="-mt-8 z-10 relative">
-                                <h3 className="font-serif text-[2.5rem] sm:text-[3rem] text-[var(--color-brand-black)] leading-[0.9] tracking-tight mb-6 group-hover:italic transition-all">
+                            <div className="-mt-4 sm:-mt-8 z-10 relative overflow-hidden w-full">
+                                <h3 className="font-serif text-[1.8rem] sm:text-[2.5rem] lg:text-[3rem] text-[var(--color-brand-black)] leading-[1] tracking-tight mb-4 sm:mb-6 group-hover:italic transition-all break-words [overflow-wrap:anywhere]">
                                     {ep.title}
                                 </h3>
                                 <p
-                                    className={`text-[15px] sm:text-[16px] text-[var(--color-brand-gray)] leading-[2] max-w-sm ${
-                                        i % 2 === 0 ? "ml-auto" : ""
+                                    className={`text-[14px] sm:text-[16px] text-[var(--color-brand-gray)] leading-[1.8] sm:leading-[2] max-w-sm break-words [overflow-wrap:anywhere] ${
+                                        i % 2 === 0 ? "md:ml-auto" : ""
                                     }`}
                                 >
                                     {isMalayalam && i === 0

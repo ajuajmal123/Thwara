@@ -12,6 +12,7 @@ import {
   getAdminTellings,
 } from "../../actions";
 import { generateSlug } from "@/lib/slug";
+import DirectMediaUpload from "@/components/admin/DirectMediaUpload";
 
 const DOMAINS = [
   "Visual Essay",
@@ -321,31 +322,13 @@ export default function AdminWebzinePage() {
               </div>
 
               {/* Cover Image URL */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-neutral-700 uppercase">Cover Poster URL</label>
-                  <Link
-                    href="/admin/media"
-                    target="_blank"
-                    className="text-[10px] text-[var(--color-brand-red)] hover:underline font-bold"
-                  >
-                    Open Media Library ↗
-                  </Link>
-                </div>
-                <input
-                  type="text"
-                  value={coverImage}
-                  onChange={(e) => setCoverImage(e.target.value)}
-                  placeholder="https://... or uploaded image URL"
-                  className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none font-mono"
-                />
-                {coverImage && (
-                  <div className="mt-2 flex items-center gap-3 p-2 bg-neutral-50 rounded border border-neutral-200">
-                    <img src={coverImage} alt="Cover preview" className="w-12 h-16 object-cover rounded border" />
-                    <span className="text-[11px] text-neutral-600 font-mono truncate">{coverImage}</span>
-                  </div>
-                )}
-              </div>
+              <DirectMediaUpload
+                label="Cover Poster / Issue Artwork"
+                value={coverImage}
+                onChange={setCoverImage}
+                type="image"
+                helpText="Upload cover artwork directly from device, select from media library, or paste image URL."
+              />
 
               {/* Excerpt */}
               <div>

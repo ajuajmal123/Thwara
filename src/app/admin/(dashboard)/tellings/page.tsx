@@ -7,6 +7,7 @@ import {
   saveTellingAction,
   deleteTellingAction,
 } from "../../actions";
+import DirectMediaUpload from "@/components/admin/DirectMediaUpload";
 
 const CATEGORIES = ["Stories", "Podcast", "Interview"] as const;
 
@@ -262,36 +263,14 @@ export default function AdminTellingsPage() {
                 </select>
               </div>
 
-              {/* Cover Image */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-neutral-700 uppercase">Cover Image URL</label>
-                  <Link
-                    href="/admin/media"
-                    target="_blank"
-                    className="text-[10px] text-[var(--color-brand-red)] hover:underline font-bold"
-                  >
-                    Open Media Library ↗
-                  </Link>
-                </div>
-                <input
-                  type="text"
-                  value={coverImage}
-                  onChange={(e) => setCoverImage(e.target.value)}
-                  placeholder="https://... or uploaded image URL"
-                  className="w-full px-3 py-2 border-2 border-neutral-300 rounded-lg font-normal text-sm focus:border-[var(--color-brand-green)] outline-none font-mono"
-                />
-                {coverImage && (
-                  <div className="mt-2 flex items-center gap-3 p-2 bg-neutral-50 rounded border border-neutral-200">
-                    <img
-                      src={coverImage}
-                      alt="Cover preview"
-                      className="w-12 h-12 object-cover rounded border"
-                    />
-                    <span className="text-[11px] text-neutral-600 font-mono truncate">{coverImage}</span>
-                  </div>
-                )}
-              </div>
+              {/* Cover Image (Direct Upload & Picker) */}
+              <DirectMediaUpload
+                label="Cover Image"
+                value={coverImage}
+                onChange={setCoverImage}
+                type="image"
+                helpText="Directly upload cover photo, select from library, or paste image URL."
+              />
 
               {/* Spotify Embed URL */}
               <div>
@@ -324,30 +303,15 @@ export default function AdminTellingsPage() {
                 )}
               </div>
 
-              {/* Direct Audio URL */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-neutral-700 uppercase">Direct Audio Link (MP3 / Audio Stream)</label>
-                  <span className="text-[10px] text-neutral-400 font-normal">Optional fallback player</span>
-                </div>
-                <input
-                  type="text"
-                  value={audioUrl}
-                  onChange={(e) => setAudioUrl(e.target.value)}
-                  placeholder="https://.../episode.mp3"
-                  className="w-full px-3 py-2 border-2 border-neutral-300 rounded-lg font-normal text-sm focus:border-[var(--color-brand-green)] outline-none font-mono"
-                />
-                {audioUrl && (
-                  <div className="mt-2 p-2 bg-neutral-50 rounded border border-neutral-200">
-                    <span className="text-[10px] text-neutral-500 uppercase font-bold block mb-1">
-                      Audio Player Preview:
-                    </span>
-                    <audio controls className="w-full h-8" src={audioUrl}>
-                      Your browser does not support audio element.
-                    </audio>
-                  </div>
-                )}
-              </div>
+              {/* Direct Audio URL (Direct Upload & Picker) */}
+              <DirectMediaUpload
+                label="Direct Audio File (MP3 / WAV / OGG)"
+                value={audioUrl}
+                onChange={setAudioUrl}
+                type="audio"
+                accept="audio/*"
+                helpText="Directly upload an audio recording from your device, or paste a link."
+              />
 
               {/* Actions */}
               <div className="flex justify-end gap-3 pt-4 border-t border-neutral-200">

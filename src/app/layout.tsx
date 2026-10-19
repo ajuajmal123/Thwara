@@ -18,6 +18,20 @@ const malayalam = Noto_Sans_Malayalam({
 export const metadata: Metadata = {
   title: "THWARA",
   description: "An independent bilingual digital media collective exploring knowledge, culture and society through critical thought and creative expression.",
+  icons: {
+    icon: [
+      { url: "/image.png" },
+      { url: "/icon.png" },
+    ],
+    shortcut: "/image.png",
+    apple: "/image.png",
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({

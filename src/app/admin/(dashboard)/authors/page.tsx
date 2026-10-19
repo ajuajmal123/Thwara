@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAdminAuthors, saveAuthorAction, deleteAuthorAction } from "../../actions";
+import DirectMediaUpload from "@/components/admin/DirectMediaUpload";
 
 export default function AdminAuthorsPage() {
   const [authors, setAuthors] = useState<any[]>([]);
@@ -115,16 +116,14 @@ export default function AdminAuthorsPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-neutral-700 uppercase mb-1">Photo URL</label>
-                <input
-                  type="text"
-                  name="photo"
-                  defaultValue={editingAuthor.photo}
-                  placeholder="https://... or /athirabhanu.jpeg"
-                  className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
-                />
-              </div>
+              <DirectMediaUpload
+                label="Author Photo / Portrait"
+                name="photo"
+                value={editingAuthor.photo || ""}
+                onChange={(url) => setEditingAuthor({ ...editingAuthor, photo: url })}
+                type="image"
+                helpText="Upload author portrait directly from device, select from media library, or paste image URL."
+              />
 
               <div>
                 <label className="block text-neutral-700 uppercase mb-1">Biography / Description</label>
