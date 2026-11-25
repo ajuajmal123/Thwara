@@ -38,31 +38,6 @@ export default async function AuthorsPage() {
         console.error("[AuthorsPage] Error fetching authors:", err);
     }
 
-    // Fallback if no authors in database yet
-    const displayAuthors: AuthorCard[] = authors.length > 0 ? authors : [
-        {
-            id: "fallback-1",
-            name: "Athira Bhanu",
-            description: "Writer and consultant psychologist exploring the emotional landscapes of human experience and sociocultural realities.",
-            photoUrl: "/athirabhanu.jpeg",
-            worksCount: 0,
-        },
-        {
-            id: "fallback-2",
-            name: "Nandana Maya Sachidanandan",
-            description: "Postgraduate in English Literature, exploring intersections of literature, culture, and society.",
-            photoUrl: "/nandana.jpeg",
-            worksCount: 0,
-        },
-        {
-            id: "fallback-3",
-            name: "Muhammed Munavver",
-            description: "Librarian curious about folklore, oral studies, cinema, and human knowledge systems.",
-            photoUrl: "/munavver.jpeg",
-            worksCount: 0,
-        }
-    ];
-
     return (
         <main className="w-full max-w-[1400px] mx-auto px-4 py-8 flex flex-col bg-white">
             <section className="border-4 border-[var(--color-brand-border)] rounded-lg p-6 sm:p-10 bg-white flex flex-col gap-8 text-center items-center">
@@ -77,7 +52,7 @@ export default async function AuthorsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 w-full">
-                    {displayAuthors.map((author) => (
+                    {authors.map((author) => (
                         <div
                             key={author.id}
                             className="flex flex-col items-center p-6 border-2 border-[var(--color-brand-border)] rounded-lg bg-white group hover:shadow-lg transition-all hover:-translate-y-1 relative"
@@ -116,6 +91,11 @@ export default async function AuthorsPage() {
                             )}
                         </div>
                     ))}
+                    {authors.length === 0 && (
+                        <p className="col-span-full py-12 text-center text-black font-medium text-lg">
+                            No authors published yet.
+                        </p>
+                    )}
                 </div>
 
                 <div className="mt-8 pt-6 border-t-2 border-dotted border-[var(--color-brand-border)] w-full flex flex-col sm:flex-row items-center justify-between gap-4">
