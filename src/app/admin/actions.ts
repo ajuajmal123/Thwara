@@ -5,14 +5,16 @@ import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin, getSupabase, supabaseUrl } from "@/lib/supabase";
 import { verifyPassword, setAdminSession, clearAdminSession, isAdminAuthenticated } from "@/lib/adminAuth";
 import { generateSlug } from "@/lib/slug";
+import { errorMessage } from "@/lib/errors";
+import type { AdminRecord } from "@/types/admin";
 
 function getClient() {
   return getSupabaseAdmin() || getSupabase();
 }
 
-function formatDbError(error: any): string {
+function formatDbError(error: unknown): string {
   if (!error) return "Unknown database error occurred";
-  const msg = error.message || (typeof error === "string" ? error : JSON.stringify(error));
+  const msg = errorMessage(error, JSON.stringify(error));
   const lower = msg.toLowerCase();
 
   if (
@@ -32,6 +34,13 @@ function formatDbError(error: any): string {
   }
 
   return msg;
+}
+
+/** True when a storage error means the bucket or object does not exist. */
+function isNotFoundError(error: { message?: string } & object): boolean {
+  if (error.message?.includes("Bucket not found")) return true;
+  const e = error as { statusCode?: string | number; status?: number };
+  return e.statusCode === "404" || e.status === 404;
 }
 
 /**
@@ -108,7 +117,7 @@ export async function getAdminArticles() {
   return data || [];
 }
 
-export async function saveArticleAction(articleData: any) {
+export async function saveArticleAction(articleData: AdminRecord) {
   const isAuth = await isAdminAuthenticated();
   if (!isAuth) throw new Error("Unauthorized");
 
@@ -139,7 +148,7 @@ export async function saveArticleAction(articleData: any) {
   }
 
   const additionalImages = Array.isArray(articleData.additional_images)
-    ? articleData.additional_images.filter((img: any) => typeof img === "string" && img.trim().length > 0)
+    ? articleData.additional_images.filter((img: unknown): img is string => typeof img === "string" && img.trim().length > 0)
     : [];
 
   const payload = {
@@ -203,7 +212,7 @@ export async function getAdminFictions() {
   return data || [];
 }
 
-export async function saveFictionAction(fictionData: any) {
+export async function saveFictionAction(fictionData: AdminRecord) {
   const isAuth = await isAdminAuthenticated();
   if (!isAuth) throw new Error("Unauthorized");
 
@@ -233,7 +242,7 @@ export async function saveFictionAction(fictionData: any) {
   }
 
   const additionalImages = Array.isArray(fictionData.additional_images)
-    ? fictionData.additional_images.filter((img: any) => typeof img === "string" && img.trim().length > 0)
+    ? fictionData.additional_images.filter((img: unknown): img is string => typeof img === "string" && img.trim().length > 0)
     : [];
 
   const payload = {
@@ -296,7 +305,7 @@ export async function getAdminFolklores() {
   return data || [];
 }
 
-export async function saveFolkloreAction(folkloreData: any) {
+export async function saveFolkloreAction(folkloreData: AdminRecord) {
   const isAuth = await isAdminAuthenticated();
   if (!isAuth) throw new Error("Unauthorized");
 
@@ -326,7 +335,7 @@ export async function saveFolkloreAction(folkloreData: any) {
   }
 
   const additionalImages = Array.isArray(folkloreData.additional_images)
-    ? folkloreData.additional_images.filter((img: any) => typeof img === "string" && img.trim().length > 0)
+    ? folkloreData.additional_images.filter((img: unknown): img is string => typeof img === "string" && img.trim().length > 0)
     : [];
 
   const payload = {
@@ -393,7 +402,7 @@ export async function getAdminTellings() {
   return data || [];
 }
 
-export async function saveTellingAction(tellingData: any) {
+export async function saveTellingAction(tellingData: AdminRecord) {
   const isAuth = await isAdminAuthenticated();
   if (!isAuth) throw new Error("Unauthorized");
 
@@ -460,7 +469,7 @@ export async function getAdminWebzines() {
   return data || [];
 }
 
-export async function saveWebzineAction(webzineData: any) {
+export async function saveWebzineAction(webzineData: AdminRecord) {
   const isAuth = await isAdminAuthenticated();
   if (!isAuth) throw new Error("Unauthorized");
 
@@ -536,7 +545,7 @@ export async function getAdminAuthors() {
   return data || [];
 }
 
-export async function saveAuthorAction(authorData: any) {
+export async function saveAuthorAction(authorData: AdminRecord) {
   const isAuth = await isAdminAuthenticated();
   if (!isAuth) throw new Error("Unauthorized");
 
@@ -636,7 +645,7 @@ export async function uploadMediaAction(formData: FormData) {
   });
 
   // If bucket does not exist, try creating it automatically using admin client
-  if (error && (error.message?.includes("Bucket not found") || (error as any).statusCode === "404" || (error as any).status === 404)) {
+  if (error && isNotFoundError(error)) {
     try {
       await supabase.storage.createBucket("media", { public: true });
       const retry = await supabase.storage.from("media").upload(path, buffer, {

@@ -1,54 +1,45 @@
 import Link from "next/link";
 import { getAuthors } from "@/services/strapiServices";
 import { getStrapiMedia } from "@/lib/strapi";
+import { fieldsOf } from "@/lib/content";
+
+interface AuthorCard {
+    id: number | string;
+    name: string;
+    description: string;
+    photoUrl: string | null;
+    worksCount: number;
+}
 
 export const dynamic = "force-dynamic";
 
 export default async function AuthorsPage() {
-    let authors: any[] = [];
-    let fetchError = false;
+    let authors: AuthorCard[] = [];
 
     try {
         const response = await getAuthors();
         if (response && response.data && Array.isArray(response.data)) {
-            authors = response.data.map((item: any) => {
-                const attrs = item.attributes || item;
+            authors = response.data.map((item) => {
+                const attrs = fieldsOf(item);
                 const name = attrs.name || attrs.authorName || "Contributing Author";
-                const description = attrs.description || attrs.bio || "";
-
-                // Resolve photo URL (handles Strapi v5 and v4 formats)
-                let photoUrl: string | null = null;
-                if (attrs.photo?.url) {
-                    photoUrl = getStrapiMedia(attrs.photo.url);
-                } else if (attrs.photo?.data?.attributes?.url) {
-                    photoUrl = getStrapiMedia(attrs.photo.data.attributes.url);
-                } else if (typeof attrs.photo === "string") {
-                    photoUrl = attrs.photo.startsWith("http") || attrs.photo.startsWith("/")
-                        ? attrs.photo
-                        : getStrapiMedia(attrs.photo);
-                }
-
-                // Related works count
-                const worksCount = (attrs.articles?.length || 0) +
-                    (attrs.folklores?.length || 0) +
-                    (attrs.fictions?.length || 0);
+                const photo = attrs.photo || "";
+                const photoUrl = photo.startsWith("http") || photo.startsWith("/") ? photo : getStrapiMedia(photo);
 
                 return {
-                    id: item.id || item.documentId || name,
+                    id: item.id,
                     name,
-                    description,
-                    photoUrl: photoUrl || `https://picsum.photos/seed/${encodeURIComponent(name)}/300/300`,
-                    worksCount,
+                    description: attrs.description || attrs.bio || "",
+                    photoUrl,
+                    worksCount: (attrs.articles?.length || 0) + (attrs.folklores?.length || 0) + (attrs.fictions?.length || 0),
                 };
             });
         }
     } catch (err) {
         console.error("[AuthorsPage] Error fetching authors:", err);
-        fetchError = true;
     }
 
     // Fallback if no authors in database yet
-    const displayAuthors = authors.length > 0 ? authors : [
+    const displayAuthors: AuthorCard[] = authors.length > 0 ? authors : [
         {
             id: "fallback-1",
             name: "Athira Bhanu",
@@ -96,12 +87,18 @@ export default async function AuthorsPage() {
                             </div>
 
                             <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-[var(--color-brand-border)] mb-4 shadow-sm">
-                                <img
-                                    src={author.photoUrl}
-                                    alt={author.name}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    loading="lazy"
-                                />
+                                {author.photoUrl ? (
+                                    <img
+                                        src={author.photoUrl}
+                                        alt={author.name}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        loading="lazy"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-neutral-100 flex items-center justify-center text-4xl font-bold text-[var(--color-brand-red)]">
+                                        {author.name.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
                             </div>
 
                             <h2 className="text-xl font-bold text-black uppercase group-hover:text-[var(--color-brand-red)] transition-colors line-clamp-1 mb-2">

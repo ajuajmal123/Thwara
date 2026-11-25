@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { fieldsOf } from "@/lib/content";
 import { getFictionBySlug } from "@/services/supabaseServices";
 import ArticleContentRenderer from "@/components/article/ArticleContentRenderer";
 
@@ -9,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   try {
     const res = await getFictionBySlug(slug);
-    const item: any = res?.data?.attributes || res?.data;
+    const item = res?.data ? fieldsOf(res.data) : null;
     if (item) {
       return {
         title: `${item.title} - THWARA Fiction`,
@@ -29,7 +30,7 @@ export default async function FictionDetailPage({
 }) {
   const { slug } = await params;
   const res = await getFictionBySlug(slug);
-  const fiction: any = res?.data?.attributes || res?.data;
+  const fiction = res?.data ? fieldsOf(res.data) : null;
 
   if (!fiction) {
     notFound();
@@ -47,7 +48,7 @@ export default async function FictionDetailPage({
   const authorPhoto =
     typeof fiction.author_photo === "string"
       ? fiction.author_photo
-      : fiction.authorPhoto?.url || null;
+      : fiction.authorPhoto || null;
 
   return (
     <main className="w-full max-w-[1000px] mx-auto px-3 sm:px-6 py-6 sm:py-12 flex flex-col bg-white overflow-hidden">
@@ -114,7 +115,7 @@ export default async function FictionDetailPage({
           <figure className="w-full max-w-full flex flex-col items-center overflow-hidden">
             <img
               src={coverUrl}
-              alt={fiction.title}
+              alt={fiction.title ?? ""}
               className="w-full max-w-full h-auto max-h-[520px] object-cover rounded-lg border-2 border-[var(--color-brand-border)] shadow-xs"
             />
           </figure>

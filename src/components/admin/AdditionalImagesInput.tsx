@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { errorMessage as toMessage } from "@/lib/errors";
+import type { MediaFile } from "@/types/admin";
 import { uploadMediaAction, listMediaFilesAction } from "@/app/admin/actions";
 
 interface AdditionalImagesInputProps {
@@ -19,7 +21,7 @@ export default function AdditionalImagesInput({
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
-  const [libraryFiles, setLibraryFiles] = useState<any[]>([]);
+  const [libraryFiles, setLibraryFiles] = useState<MediaFile[]>([]);
   const [libraryLoading, setLibraryLoading] = useState(false);
   const [librarySearch, setLibrarySearch] = useState("");
 
@@ -63,8 +65,8 @@ export default function AdditionalImagesInput({
       }
 
       onChange([...images, ...newUrls]);
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to upload one or more images.");
+    } catch (err) {
+      setErrorMessage(toMessage(err, "Failed to upload one or more images."));
     } finally {
       setUploading(false);
       setUploadProgress(null);

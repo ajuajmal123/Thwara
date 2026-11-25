@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { errorMessage } from "@/lib/errors";
+import type { MediaFile } from "@/types/admin";
 import { uploadMediaAction, listMediaFilesAction } from "@/app/admin/actions";
 
 interface RichBodyEditorProps {
@@ -24,7 +26,7 @@ export default function RichBodyEditor({
   const [embedUrl, setEmbedUrl] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
-  const [libraryFiles, setLibraryFiles] = useState<any[]>([]);
+  const [libraryFiles, setLibraryFiles] = useState<MediaFile[]>([]);
   const [libraryLoading, setLibraryLoading] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,7 +61,7 @@ export default function RichBodyEditor({
     if (!content.trim()) {
       return (
         <p className="text-neutral-400 italic text-sm py-8 text-center">
-          No content written yet. Switch to "Write" to start crafting your piece.
+          No content written yet. Switch to &ldquo;Write&rdquo; to start crafting your piece.
         </p>
       );
     }
@@ -225,7 +227,7 @@ export default function RichBodyEditor({
               title="Add Blockquote"
               className="px-2.5 py-1 bg-white hover:bg-neutral-200 border border-neutral-300 rounded font-bold text-neutral-800 text-[11px] cursor-pointer"
             >
-              " Quote
+              &ldquo; Quote
             </button>
             <button
               type="button"
@@ -350,8 +352,8 @@ export default function RichBodyEditor({
                     if (res?.url) {
                       setEmbedUrl(res.url);
                     }
-                  } catch (err: any) {
-                    setImageError(err.message || "Failed to upload image");
+                  } catch (err) {
+                    setImageError(errorMessage(err, "Failed to upload image"));
                   } finally {
                     setUploadingImage(false);
                     e.target.value = "";
@@ -401,7 +403,10 @@ export default function RichBodyEditor({
             </div>
 
             {/* Quick Media Library Browser (last 6 files) */}
-            {libraryFiles.length > 0 && (
+            {libraryLoading && (
+              <p className="text-[11px] text-neutral-500 pt-2 border-t">Loading recent uploads…</p>
+            )}
+            {!libraryLoading && libraryFiles.length > 0 && (
               <div className="flex flex-col gap-1.5 pt-2 border-t">
                 <span className="text-[11px] font-bold uppercase text-neutral-600">
                   Or pick from recent uploads:

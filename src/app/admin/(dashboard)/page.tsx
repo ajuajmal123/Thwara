@@ -139,7 +139,7 @@ export default async function AdminOverviewPage() {
         <ul className="text-xs text-neutral-600 flex flex-col gap-2">
           <li>• <strong>Publishing an Article:</strong> Use the Articles manager. Slugs are automatically created from titles, and images can be pasted via URL or uploaded through the Media Library.</li>
           <li>• <strong>Reviewing Pitches:</strong> When users submit articles on the public website, they appear in the Submissions Inbox where you can read their details and download attached documents.</li>
-          <li>• <strong>Editing Existing Content:</strong> Click "Edit" next to any record, modify the text, and click "Save Changes". It will instantly update across the live website.</li>
+          <li>• <strong>Editing Existing Content:</strong> Click &ldquo;Edit&rdquo; next to any record, modify the text, and click &ldquo;Save Changes&rdquo;. It will instantly update across the live website.</li>
         </ul>
       </div>
     </div>

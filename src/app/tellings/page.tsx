@@ -1,44 +1,48 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { fieldsOf, coverOf } from "@/lib/content";
 import { getTellings } from "@/services/supabaseServices";
 
 const CATEGORIES = ["All", "Stories", "Podcast", "Interview"];
 
+interface TellingItem {
+    id: number;
+    title: string;
+    type: string;
+    coverImage: string;
+    spotifyUrl: string;
+    audioUrl: string;
+}
+
 export default function TellingsPage() {
     const [activeCategory, setActiveCategory] = useState("All");
-    const [items, setItems] = useState<any[]>([
-        { id: 1, title: "Audio Series #1", type: "Stories", spotifyUrl: "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0" },
-        { id: 2, title: "Critical Voices Podcast", type: "Podcast", spotifyUrl: "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0" },
-        { id: 3, title: "Conversations with Writers", type: "Interview", spotifyUrl: "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0" },
-    ]);
+    const [items, setItems] = useState<TellingItem[] | null>(null);
 
     useEffect(() => {
-        async function fetchLiveTellings() {
-            try {
-                const res = await getTellings();
-                if (res?.data && res.data.length > 0) {
-                    const mapped = res.data.map((entity: any) => {
-                        const attr = entity.attributes || entity;
+        getTellings()
+            .then((res) => {
+                setItems(
+                    (res?.data ?? []).map((entity) => {
+                        const attr = fieldsOf(entity);
                         return {
                             id: entity.id,
                             title: attr.title || `Audio Piece #${entity.id}`,
                             type: attr.category || "Stories",
-                            coverImage: attr.cover_image || attr.coverImage,
-                            spotifyUrl: attr.spotify_url || attr.spotifyUrl,
-                            audioUrl: attr.audio_url || attr.audioUrl,
+                            coverImage: coverOf(attr),
+                            spotifyUrl: attr.spotify_url || attr.spotifyUrl || "",
+                            audioUrl: attr.audio_url || "",
                         };
-                    });
-                    setItems(mapped);
-                }
-            } catch (err) {
-                console.log("Using static tellings as fallback");
-            }
-        }
-        fetchLiveTellings();
+                    })
+                );
+            })
+            .catch((err) => {
+                console.error("[TellingsPage] Failed to load tellings:", err);
+                setItems([]);
+            });
     }, []);
 
-    const filteredItems = activeCategory === "All" ? items : items.filter(item => item.type === activeCategory);
+    const filteredItems = activeCategory === "All" ? items ?? [] : (items ?? []).filter(item => item.type === activeCategory);
 
     return (
         <main className="w-full max-w-[1400px] mx-auto px-4 py-8 flex flex-col bg-white gap-8">
@@ -87,7 +91,6 @@ export default function TellingsPage() {
                             <div className="flex flex-col gap-2 text-left">
                                 <h3 className="text-xl font-bold text-black">{item.title}</h3>
                                 <span className="text-xs text-[var(--color-brand-red)] font-bold uppercase tracking-wider">{item.type}</span>
-                                <p className="text-sm text-black line-clamp-2 mt-1">An engaging piece blending sound, narrative, and critical storytelling. Explore the depths of our audio catalog.</p>
                                 
                                 {item.spotifyUrl && (
                                     <div className="mt-4 w-full">
@@ -114,9 +117,9 @@ export default function TellingsPage() {
                             </div>
                         </div>
                     ))}
-                    {filteredItems.length === 0 && (
+                    {items !== null && filteredItems.length === 0 && (
                         <div className="col-span-full py-12 text-center text-black font-medium text-lg">
-                            No tellings found in {activeCategory}.
+                            {items.length === 0 ? "No tellings published yet." : `No tellings found in ${activeCategory}.`}
                         </div>
                     )}
                 </div>

@@ -1,57 +1,35 @@
 import { getSupabase } from "@/lib/supabase";
-import {
-  Article,
-  Folklore,
-  Fiction,
-  Webzine,
-  Author,
-  Tellings,
-  StrapiCollectionResponse,
-  StrapiSingleResponse,
-} from "@/types/schema";
-import { ARTICLES } from "@/data/articles";
-import { CREATIVE_WORKS } from "@/data/creative";
-import { WEBZINE_PROJECTS } from "@/data/webzine";
-import { CONTRIBUTORS } from "@/data/contributors";
+import type { ContentRow, CollectionResponse, SingleResponse, Submission } from "@/types/schema";
 
 /**
  * Normalizes Supabase database rows into an entity format compatible with both
  * traditional REST and legacy Strapi format (supports item.title and item.attributes.title)
  */
-function normalizeEntity<T>(row: any): any {
-  if (!row) return null;
+type DbRow = Record<string, unknown> & { id: number; cover_image?: unknown };
+
+function normalizeEntity(row: DbRow): ContentRow {
+  const r = row as unknown as ContentRow;
+  const aliases = {
+    authorName: r.author_name || r.authorName,
+    coverImage: typeof row.cover_image === "string" ? { url: row.cover_image } : r.coverImage,
+    authorPhoto: r.author_photo || r.authorPhoto,
+    authorDescription: r.author_description || r.authorDescription,
+    narratorName: r.narrator_name || r.narratorName,
+    narratorPhoto: r.narrator_photo || r.narratorPhoto,
+    narratorDescription: r.narrator_description || r.narratorDescription,
+    spotifyUrl: r.spotify_url || r.spotifyUrl,
+    issueNumber: r.issue_number || r.issueNumber,
+    webzineName: r.webzine_name || r.webzineName,
+    workName: r.work_name || r.workName,
+  };
   return {
-    id: row.id,
-    attributes: {
-      ...row,
-      authorName: row.author_name || row.authorName,
-      coverImage: typeof row.cover_image === "string" ? { url: row.cover_image } : row.cover_image,
-      authorPhoto: row.author_photo || row.authorPhoto,
-      authorDescription: row.author_description || row.authorDescription,
-      narratorName: row.narrator_name || row.narratorName,
-      narratorPhoto: row.narrator_photo || row.narratorPhoto,
-      narratorDescription: row.narrator_description || row.narratorDescription,
-      spotifyUrl: row.spotify_url || row.spotifyUrl,
-      issueNumber: row.issue_number || row.issueNumber,
-      webzineName: row.webzine_name || row.webzineName,
-      workName: row.work_name || row.workName,
-    },
-    ...row,
-    authorName: row.author_name || row.authorName,
-    coverImage: typeof row.cover_image === "string" ? { url: row.cover_image } : row.cover_image,
-    authorPhoto: row.author_photo || row.authorPhoto,
-    authorDescription: row.author_description || row.authorDescription,
-    narratorName: row.narrator_name || row.narratorName,
-    narratorPhoto: row.narrator_photo || row.narratorPhoto,
-    narratorDescription: row.narrator_description || row.narratorDescription,
-    spotifyUrl: row.spotify_url || row.spotifyUrl,
-    issueNumber: row.issue_number || row.issueNumber,
-    webzineName: row.webzine_name || row.webzineName,
-    workName: row.work_name || row.workName,
+    ...r,
+    ...aliases,
+    attributes: { ...r, ...aliases },
   };
 }
 
-function emptyCollection<T>(page = 1, pageSize = 10): StrapiCollectionResponse<T> {
+function emptyCollection(page = 1, pageSize = 10): CollectionResponse {
   return {
     data: [],
     meta: {
@@ -68,9 +46,9 @@ function emptyCollection<T>(page = 1, pageSize = 10): StrapiCollectionResponse<T
 /**
  * Fetches all Articles with pagination
  */
-export async function getArticles(page = 1, pageSize = 10): Promise<StrapiCollectionResponse<Article>> {
+export async function getArticles(page = 1, pageSize = 10): Promise<CollectionResponse> {
   const supabase = getSupabase();
-  if (!supabase) return emptyCollection<Article>(page, pageSize);
+  if (!supabase) return emptyCollection(page, pageSize);
 
   try {
     const from = (page - 1) * pageSize;
@@ -84,12 +62,12 @@ export async function getArticles(page = 1, pageSize = 10): Promise<StrapiCollec
 
     if (error) {
       console.error("[Supabase] getArticles error:", error.message);
-      return emptyCollection<Article>(page, pageSize);
+      return emptyCollection(page, pageSize);
     }
 
     const total = count || (data?.length || 0);
     return {
-      data: (data || []).map((row) => normalizeEntity<Article>(row)),
+      data: ((data || []) as DbRow[]).map(normalizeEntity),
       meta: {
         pagination: {
           page,
@@ -101,14 +79,14 @@ export async function getArticles(page = 1, pageSize = 10): Promise<StrapiCollec
     };
   } catch (err) {
     console.error("[Supabase] getArticles exception:", err);
-    return emptyCollection<Article>(page, pageSize);
+    return emptyCollection(page, pageSize);
   }
 }
 
 /**
  * Fetches a single Article by slug
  */
-export async function getArticleBySlug(slug: string): Promise<StrapiSingleResponse<Article> | null> {
+export async function getArticleBySlug(slug: string): Promise<SingleResponse | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
 
@@ -130,7 +108,7 @@ export async function getArticleBySlug(slug: string): Promise<StrapiSingleRespon
       .maybeSingle();
 
     if (!slugErr && bySlug) {
-      return { data: normalizeEntity<Article>(bySlug) };
+      return { data: normalizeEntity(bySlug as DbRow) };
     }
 
     // Fallback if accessed via numeric id
@@ -141,7 +119,7 @@ export async function getArticleBySlug(slug: string): Promise<StrapiSingleRespon
         .eq("id", Number(raw))
         .limit(1)
         .maybeSingle();
-      if (byId) return { data: normalizeEntity<Article>(byId) };
+      if (byId) return { data: normalizeEntity(byId as DbRow) };
     }
 
     return null;
@@ -156,9 +134,9 @@ export async function getArticleBySlug(slug: string): Promise<StrapiSingleRespon
  */
 export async function getTellingsByCategory(
   category: "Stories" | "Podcast" | "Interview"
-): Promise<StrapiCollectionResponse<Tellings>> {
+): Promise<CollectionResponse> {
   const supabase = getSupabase();
-  if (!supabase) return emptyCollection<Tellings>();
+  if (!supabase) return emptyCollection();
 
   try {
     const { data, error } = await supabase
@@ -169,11 +147,11 @@ export async function getTellingsByCategory(
 
     if (error) {
       console.error("[Supabase] getTellingsByCategory error:", error.message);
-      return emptyCollection<Tellings>();
+      return emptyCollection();
     }
 
     return {
-      data: (data || []).map((row) => normalizeEntity<Tellings>(row)),
+      data: ((data || []) as DbRow[]).map(normalizeEntity),
       meta: {
         pagination: {
           page: 1,
@@ -185,15 +163,15 @@ export async function getTellingsByCategory(
     };
   } catch (err) {
     console.error("[Supabase] getTellingsByCategory exception:", err);
-    return emptyCollection<Tellings>();
+    return emptyCollection();
   }
 }
 
 export async function getTellings(
   category?: string
-): Promise<StrapiCollectionResponse<Tellings>> {
+): Promise<CollectionResponse> {
   const supabase = getSupabase();
-  if (!supabase) return emptyCollection<Tellings>();
+  if (!supabase) return emptyCollection();
 
   try {
     let query = supabase.from("tellings").select("*").order("created_at", { ascending: false });
@@ -204,11 +182,11 @@ export async function getTellings(
 
     if (error) {
       console.error("[Supabase] getTellings error:", error.message);
-      return emptyCollection<Tellings>();
+      return emptyCollection();
     }
 
     return {
-      data: (data || []).map((row) => normalizeEntity<Tellings>(row)),
+      data: ((data || []) as DbRow[]).map(normalizeEntity),
       meta: {
         pagination: {
           page: 1,
@@ -220,16 +198,16 @@ export async function getTellings(
     };
   } catch (err) {
     console.error("[Supabase] getTellings exception:", err);
-    return emptyCollection<Tellings>();
+    return emptyCollection();
   }
 }
 
 /**
  * Fiction
  */
-export async function getFictions(page = 1, pageSize = 10): Promise<StrapiCollectionResponse<Fiction>> {
+export async function getFictions(page = 1, pageSize = 10): Promise<CollectionResponse> {
   const supabase = getSupabase();
-  if (!supabase) return emptyCollection<Fiction>(page, pageSize);
+  if (!supabase) return emptyCollection(page, pageSize);
 
   try {
     const from = (page - 1) * pageSize;
@@ -243,12 +221,12 @@ export async function getFictions(page = 1, pageSize = 10): Promise<StrapiCollec
 
     if (error) {
       console.error("[Supabase] getFictions error:", error.message);
-      return emptyCollection<Fiction>(page, pageSize);
+      return emptyCollection(page, pageSize);
     }
 
     const total = count || (data?.length || 0);
     return {
-      data: (data || []).map((row) => normalizeEntity<Fiction>(row)),
+      data: ((data || []) as DbRow[]).map(normalizeEntity),
       meta: {
         pagination: {
           page,
@@ -260,16 +238,16 @@ export async function getFictions(page = 1, pageSize = 10): Promise<StrapiCollec
     };
   } catch (err) {
     console.error("[Supabase] getFictions exception:", err);
-    return emptyCollection<Fiction>(page, pageSize);
+    return emptyCollection(page, pageSize);
   }
 }
 
 /**
  * Folklore
  */
-export async function getFolklore(page = 1, pageSize = 10): Promise<StrapiCollectionResponse<Folklore>> {
+export async function getFolklore(page = 1, pageSize = 10): Promise<CollectionResponse> {
   const supabase = getSupabase();
-  if (!supabase) return emptyCollection<Folklore>(page, pageSize);
+  if (!supabase) return emptyCollection(page, pageSize);
 
   try {
     const from = (page - 1) * pageSize;
@@ -283,12 +261,12 @@ export async function getFolklore(page = 1, pageSize = 10): Promise<StrapiCollec
 
     if (error) {
       console.error("[Supabase] getFolklore error:", error.message);
-      return emptyCollection<Folklore>(page, pageSize);
+      return emptyCollection(page, pageSize);
     }
 
     const total = count || (data?.length || 0);
     return {
-      data: (data || []).map((row) => normalizeEntity<Folklore>(row)),
+      data: ((data || []) as DbRow[]).map(normalizeEntity),
       meta: {
         pagination: {
           page,
@@ -300,14 +278,14 @@ export async function getFolklore(page = 1, pageSize = 10): Promise<StrapiCollec
     };
   } catch (err) {
     console.error("[Supabase] getFolklore exception:", err);
-    return emptyCollection<Folklore>(page, pageSize);
+    return emptyCollection(page, pageSize);
   }
 }
 
 /**
  * Fetches a single Fiction piece by slug or ID
  */
-export async function getFictionBySlug(slug: string): Promise<StrapiSingleResponse<Fiction> | null> {
+export async function getFictionBySlug(slug: string): Promise<SingleResponse | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
 
@@ -328,7 +306,7 @@ export async function getFictionBySlug(slug: string): Promise<StrapiSingleRespon
       .maybeSingle();
 
     if (!slugErr && bySlug) {
-      return { data: normalizeEntity<Fiction>(bySlug) };
+      return { data: normalizeEntity(bySlug as DbRow) };
     }
 
     if (!isNaN(Number(raw))) {
@@ -338,7 +316,7 @@ export async function getFictionBySlug(slug: string): Promise<StrapiSingleRespon
         .eq("id", Number(raw))
         .limit(1)
         .maybeSingle();
-      if (byId) return { data: normalizeEntity<Fiction>(byId) };
+      if (byId) return { data: normalizeEntity(byId as DbRow) };
     }
 
     return null;
@@ -351,7 +329,7 @@ export async function getFictionBySlug(slug: string): Promise<StrapiSingleRespon
 /**
  * Fetches a single Folklore entry by slug or ID
  */
-export async function getFolkloreBySlug(slug: string): Promise<StrapiSingleResponse<Folklore> | null> {
+export async function getFolkloreBySlug(slug: string): Promise<SingleResponse | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
 
@@ -372,7 +350,7 @@ export async function getFolkloreBySlug(slug: string): Promise<StrapiSingleRespo
       .maybeSingle();
 
     if (!slugErr && bySlug) {
-      return { data: normalizeEntity<Folklore>(bySlug) };
+      return { data: normalizeEntity(bySlug as DbRow) };
     }
 
     if (!isNaN(Number(raw))) {
@@ -382,7 +360,7 @@ export async function getFolkloreBySlug(slug: string): Promise<StrapiSingleRespo
         .eq("id", Number(raw))
         .limit(1)
         .maybeSingle();
-      if (byId) return { data: normalizeEntity<Folklore>(byId) };
+      if (byId) return { data: normalizeEntity(byId as DbRow) };
     }
 
     return null;
@@ -395,9 +373,9 @@ export async function getFolkloreBySlug(slug: string): Promise<StrapiSingleRespo
 /**
  * Webzine (Curated issues)
  */
-export async function getWebzines(): Promise<StrapiCollectionResponse<Webzine>> {
+export async function getWebzines(): Promise<CollectionResponse> {
   const supabase = getSupabase();
-  if (!supabase) return emptyCollection<Webzine>();
+  if (!supabase) return emptyCollection();
 
   try {
     const { data, error } = await supabase
@@ -407,11 +385,11 @@ export async function getWebzines(): Promise<StrapiCollectionResponse<Webzine>> 
 
     if (error) {
       console.error("[Supabase] getWebzines error:", error.message);
-      return emptyCollection<Webzine>();
+      return emptyCollection();
     }
 
     return {
-      data: (data || []).map((row) => normalizeEntity<Webzine>(row)),
+      data: ((data || []) as DbRow[]).map(normalizeEntity),
       meta: {
         pagination: {
           page: 1,
@@ -423,11 +401,11 @@ export async function getWebzines(): Promise<StrapiCollectionResponse<Webzine>> 
     };
   } catch (err) {
     console.error("[Supabase] getWebzines exception:", err);
-    return emptyCollection<Webzine>();
+    return emptyCollection();
   }
 }
 
-export async function getWebzineById(id: string | number): Promise<StrapiSingleResponse<Webzine> | null> {
+export async function getWebzineById(id: string | number): Promise<SingleResponse | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
 
@@ -448,7 +426,7 @@ export async function getWebzineById(id: string | number): Promise<StrapiSingleR
       .maybeSingle();
 
     if (!slugErr && bySlug) {
-      return { data: normalizeEntity<Webzine>(bySlug) };
+      return { data: normalizeEntity(bySlug as DbRow) };
     }
 
     if (!isNaN(Number(raw))) {
@@ -458,7 +436,7 @@ export async function getWebzineById(id: string | number): Promise<StrapiSingleR
         .eq("id", Number(raw))
         .limit(1)
         .maybeSingle();
-      if (byId) return { data: normalizeEntity<Webzine>(byId) };
+      if (byId) return { data: normalizeEntity(byId as DbRow) };
     }
 
     return null;
@@ -471,9 +449,9 @@ export async function getWebzineById(id: string | number): Promise<StrapiSingleR
 /**
  * Authors
  */
-export async function getAuthors(): Promise<StrapiCollectionResponse<Author>> {
+export async function getAuthors(): Promise<CollectionResponse> {
   const supabase = getSupabase();
-  if (!supabase) return emptyCollection<Author>();
+  if (!supabase) return emptyCollection();
 
   try {
     const { data, error } = await supabase
@@ -483,11 +461,11 @@ export async function getAuthors(): Promise<StrapiCollectionResponse<Author>> {
 
     if (error) {
       console.error("[Supabase] getAuthors error:", error.message);
-      return emptyCollection<Author>();
+      return emptyCollection();
     }
 
     return {
-      data: (data || []).map((row) => normalizeEntity<Author>(row)),
+      data: ((data || []) as DbRow[]).map(normalizeEntity),
       meta: {
         pagination: {
           page: 1,
@@ -499,28 +477,21 @@ export async function getAuthors(): Promise<StrapiCollectionResponse<Author>> {
     };
   } catch (err) {
     console.error("[Supabase] getAuthors exception:", err);
-    return emptyCollection<Author>();
+    return emptyCollection();
   }
 }
 
 /**
  * Submissions (Handles both document file uploads to Supabase Storage and records in Supabase DB)
  */
-export async function postSubmission(submissionData: FormData | any) {
+export async function postSubmission(submissionData: FormData | Submission | { data: Submission }) {
   const supabase = getSupabase();
   if (!supabase) {
     console.warn("[Supabase] Submissions: Supabase client is not configured. Submission saved locally for demo.");
     return { success: true, message: "Submission simulated (configure Supabase to persist)." };
   }
 
-  let payload: {
-    authorName?: string;
-    email?: string;
-    title?: string;
-    googleDriveLink?: string;
-    agreedToPrivacy?: boolean;
-    status?: string;
-  } = {};
+  let payload: Submission = {};
 
   let documentFile: File | null = null;
 
@@ -546,7 +517,8 @@ export async function postSubmission(submissionData: FormData | any) {
       documentFile = doc;
     }
   } else if (typeof submissionData === "object" && submissionData !== null) {
-    payload = submissionData.data || submissionData;
+    const obj = submissionData as Submission | { data: Submission };
+    payload = "data" in obj ? obj.data : obj;
   }
 
   let documentUrl: string | null = null;
@@ -624,7 +596,6 @@ export async function searchAllContent(rawQuery: string): Promise<SearchResultIt
   const query = (rawQuery || "").trim();
   if (!query) return [];
 
-  const q = query.toLowerCase();
   const results: SearchResultItem[] = [];
   const seenHrefs = new Set<string>();
 
@@ -666,7 +637,7 @@ export async function searchAllContent(rawQuery: string): Promise<SearchResultIt
       ]);
 
       if (artRes.status === "fulfilled" && artRes.value.data) {
-        artRes.value.data.forEach((row: any) => {
+        artRes.value.data.forEach((row) => {
           const href = `/articles/${row.slug || row.id}`;
           if (!seenHrefs.has(href)) {
             seenHrefs.add(href);
@@ -686,7 +657,7 @@ export async function searchAllContent(rawQuery: string): Promise<SearchResultIt
       }
 
       if (ficRes.status === "fulfilled" && ficRes.value.data) {
-        ficRes.value.data.forEach((row: any) => {
+        ficRes.value.data.forEach((row) => {
           const href = `/fiction/${row.slug || row.id}`;
           if (!seenHrefs.has(href)) {
             seenHrefs.add(href);
@@ -706,7 +677,7 @@ export async function searchAllContent(rawQuery: string): Promise<SearchResultIt
       }
 
       if (folRes.status === "fulfilled" && folRes.value.data) {
-        folRes.value.data.forEach((row: any) => {
+        folRes.value.data.forEach((row) => {
           const href = `/folklore/${row.slug || row.id}`;
           if (!seenHrefs.has(href)) {
             seenHrefs.add(href);
@@ -726,7 +697,7 @@ export async function searchAllContent(rawQuery: string): Promise<SearchResultIt
       }
 
       if (webRes.status === "fulfilled" && webRes.value.data) {
-        webRes.value.data.forEach((row: any) => {
+        webRes.value.data.forEach((row) => {
           const href = `/webzine/${row.slug || row.id}`;
           if (!seenHrefs.has(href)) {
             seenHrefs.add(href);
@@ -746,7 +717,7 @@ export async function searchAllContent(rawQuery: string): Promise<SearchResultIt
       }
 
       if (telRes.status === "fulfilled" && telRes.value.data) {
-        telRes.value.data.forEach((row: any) => {
+        telRes.value.data.forEach((row) => {
           const href = `/tellings`;
           results.push({
             id: `db-tel-${row.id}`,
@@ -763,7 +734,7 @@ export async function searchAllContent(rawQuery: string): Promise<SearchResultIt
       }
 
       if (autRes.status === "fulfilled" && autRes.value.data) {
-        autRes.value.data.forEach((row: any) => {
+        autRes.value.data.forEach((row) => {
           const href = `/authors`;
           results.push({
             id: `db-aut-${row.id}`,
@@ -781,103 +752,6 @@ export async function searchAllContent(rawQuery: string): Promise<SearchResultIt
       console.error("[Supabase searchAllContent error]:", err);
     }
   }
-
-  // Also include matching static data as fallback / augmentation
-  // Static Articles
-  ARTICLES.forEach((item) => {
-    const matches =
-      (item.title && item.title.toLowerCase().includes(q)) ||
-      (item.author && item.author.toLowerCase().includes(q)) ||
-      (item.excerpt && item.excerpt.toLowerCase().includes(q)) ||
-      (item.category && item.category.toLowerCase().includes(q));
-
-    const href = `/articles/${item.slug}`;
-    if (matches && !seenHrefs.has(href)) {
-      seenHrefs.add(href);
-      results.push({
-        id: `static-art-${item.id}`,
-        origin: "Article",
-        title: item.title,
-        excerpt: item.excerpt,
-        author: item.author,
-        date: item.date,
-        category: item.category,
-        coverImage: item.coverImage,
-        href,
-      });
-    }
-  });
-
-  // Static Creative Works -> Fiction & Folklore
-  CREATIVE_WORKS.forEach((item) => {
-    const matches =
-      (item.title && item.title.toLowerCase().includes(q)) ||
-      (item.author && item.author.toLowerCase().includes(q)) ||
-      (item.excerpt && item.excerpt.toLowerCase().includes(q)) ||
-      (item.type && item.type.toLowerCase().includes(q));
-
-    const href = `/fiction/${item.slug}`;
-    if (matches && !seenHrefs.has(href)) {
-      seenHrefs.add(href);
-      results.push({
-        id: `static-cre-${item.id}`,
-        origin: "Fiction",
-        title: item.title,
-        excerpt: item.excerpt,
-        author: item.author,
-        date: item.date,
-        category: item.type,
-        coverImage: item.coverImage,
-        href,
-      });
-    }
-  });
-
-  // Static Webzine Projects
-  WEBZINE_PROJECTS.forEach((item) => {
-    const matches =
-      (item.title && item.title.toLowerCase().includes(q)) ||
-      (Array.isArray(item.contributors) && item.contributors.some((c) => c.toLowerCase().includes(q))) ||
-      (item.excerpt && item.excerpt.toLowerCase().includes(q)) ||
-      (item.type && item.type.toLowerCase().includes(q));
-
-    const href = `/webzine/${item.slug}`;
-    if (matches && !seenHrefs.has(href)) {
-      seenHrefs.add(href);
-      results.push({
-        id: `static-web-${item.id}`,
-        origin: "Webzine",
-        title: item.title,
-        excerpt: item.excerpt,
-        author: Array.isArray(item.contributors) ? item.contributors.join(", ") : "Thwara Collective",
-        date: item.date,
-        category: item.type,
-        coverImage: item.coverImage,
-        href,
-      });
-    }
-  });
-
-  // Static Contributors
-  CONTRIBUTORS.forEach((cont) => {
-    const matches =
-      (cont.name && cont.name.toLowerCase().includes(q)) ||
-      (cont.role && cont.role.toLowerCase().includes(q)) ||
-      (cont.bio && cont.bio.toLowerCase().includes(q));
-
-    const href = `/authors`;
-    if (matches) {
-      results.push({
-        id: `static-con-${cont.id}`,
-        origin: "Author",
-        title: cont.name,
-        excerpt: cont.bio || `${cont.role} at THWARA`,
-        author: cont.name,
-        category: cont.role,
-        href,
-      });
-    }
-  });
 
   return results;
 }

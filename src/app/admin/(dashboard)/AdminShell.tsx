@@ -16,10 +16,12 @@ export default function AdminShell({ children, hasServiceRoleKey }: AdminShellPr
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showConfigHelper, setShowConfigHelper] = useState(false);
 
-  // Close mobile drawer when route changes
-  useEffect(() => {
+  // Close mobile drawer when route changes (adjusting state during render, per React docs)
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
     setMobileMenuOpen(false);
-  }, [pathname]);
+  }
 
   // Prevent background scroll when mobile drawer is open
   useEffect(() => {
@@ -365,9 +367,9 @@ export default function AdminShell({ children, hasServiceRoleKey }: AdminShellPr
                 </div>
 
                 <div className="bg-neutral-50 p-3 rounded-lg border border-neutral-200 flex flex-col gap-1.5 font-mono text-[11px]">
-                  <span className="font-bold text-neutral-900 font-sans">Step 2: Copy the "service_role" Secret Key</span>
+                  <span className="font-bold text-neutral-900 font-sans">Step 2: Copy the &ldquo;service_role&rdquo; Secret Key</span>
                   <p className="font-sans text-neutral-600">
-                    Find the key named <code>service_role</code> (marked <em>secret</em>). Click "Reveal" or "Copy".
+                    Find the key named <code>service_role</code> (marked <em>secret</em>). Click &ldquo;Reveal&rdquo; or &ldquo;Copy&rdquo;.
                   </p>
                 </div>
 

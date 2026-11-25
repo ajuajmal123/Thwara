@@ -2,22 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { uploadMediaAction, listMediaFilesAction } from "../../actions";
+import type { MediaFile } from "@/types/admin";
+import { errorMessage as toMessage } from "@/lib/errors";
 
 export default function AdminMediaPage() {
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<MediaFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const fetchFiles = async () => {
-    try {
-      const data = await listMediaFilesAction();
-      setFiles(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const fetchFiles = () =>
+    listMediaFilesAction()
+      .then(setFiles)
+      .catch((err) => console.error(err));
 
   useEffect(() => {
     fetchFiles();
@@ -37,8 +35,8 @@ export default function AdminMediaPage() {
       const res = await uploadMediaAction(formData);
       setUploadedUrl(res.url);
       fetchFiles();
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to upload image.");
+    } catch (err) {
+      setErrorMessage(toMessage(err, "Failed to upload image."));
     } finally {
       setUploading(false);
       // Reset input

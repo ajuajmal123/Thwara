@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getArticles } from "@/services/supabaseServices";
-import { getStrapiMedia } from "@/lib/strapi";
+import { fieldsOf, coverOf, snippetOf } from "@/lib/content";
 
 const CATEGORIES = [
   "All",
@@ -19,76 +19,48 @@ const CATEGORIES = [
   "Memoir",
 ];
 
+interface ArticleItem {
+  id: number;
+  category: string;
+  title: string;
+  author: string;
+  coverImage: string;
+  snippet: string;
+  slug: string;
+}
+
 export default function ArticlesPage() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [items, setItems] = useState<any[]>([
-    {
-      id: 1,
-      category: "Literature",
-      title: "Critical Analysis on Subject #1",
-      author: "Thwara Collective",
-      coverImage: "https://picsum.photos/seed/articles1/600/400",
-      slug: "1",
-      snippet: "A comprehensive look at the intersection of modern culture and traditional practices.",
-    },
-    {
-      id: 2,
-      category: "History",
-      title: "Critical Analysis on Subject #2",
-      author: "Thwara Collective",
-      coverImage: "https://picsum.photos/seed/articles2/600/400",
-      slug: "2",
-      snippet: "Investigating historical trajectories and cultural transformations.",
-    },
-  ]);
+  const [items, setItems] = useState<ArticleItem[] | null>(null);
 
   useEffect(() => {
-    async function fetchLiveArticles() {
-      try {
-        const res = await getArticles(1, 50);
-        if (res?.data && res.data.length > 0) {
-          const mapped = res.data.map((entity: any) => {
-            const attr = entity.attributes || entity;
-            let cover = attr.cover_image;
-            if (!cover && attr.coverImage?.url) {
-              cover = getStrapiMedia(attr.coverImage.url);
-            }
-            if (!cover) {
-              cover = `https://picsum.photos/seed/articles${entity.id}/600/400`;
-            }
-
-            const snippet =
-              attr.subheading ||
-              (attr.content
-                ? attr.content
-                    .replace(/[#*`>_\[\]\(\)]/g, "")
-                    .trim()
-                    .slice(0, 140) + "..."
-                : "A comprehensive critical look at cultural perspectives and narratives.");
-
+    getArticles(1, 50)
+      .then((res) => {
+        setItems(
+          (res?.data ?? []).map((entity) => {
+            const attr = fieldsOf(entity);
             return {
               id: entity.id,
               category: attr.domain || "Literature",
               title: attr.title || `Article #${entity.id}`,
               author: attr.author_name || attr.authorName || "Thwara Editorial",
-              coverImage: cover,
-              snippet,
+              coverImage: coverOf(attr),
+              snippet: attr.subheading || snippetOf(attr.content),
               slug: attr.slug || String(entity.id),
             };
-          });
-          setItems(mapped);
-        }
-      } catch (err) {
-        console.log("Using static articles as fallback", err);
-      }
-    }
-    fetchLiveArticles();
+          })
+        );
+      })
+      .catch((err) => {
+        console.error("[ArticlesPage] Failed to load:", err);
+        setItems([]);
+      });
   }, []);
 
   const filteredItems =
     activeCategory === "All"
-      ? items
-      : items.filter((item) => item.category === activeCategory);
+      ? items ?? []
+      : (items ?? []).filter((item) => item.category === activeCategory);
 
   return (
     <main className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-6 sm:py-8 flex flex-col bg-white overflow-hidden">
@@ -124,12 +96,18 @@ export default function ArticlesPage() {
             >
               <div className="min-w-0">
                 <Link href={`/articles/${item.slug}`} className="block overflow-hidden rounded mb-4">
+{item.coverImage ? (
                   <img
                     src={item.coverImage}
                     className="w-full aspect-video object-cover rounded border-2 border-[var(--color-brand-border)] group-hover:scale-102 transition-transform duration-300"
                     loading="lazy"
                     alt={item.title}
                   />
+                ) : (
+                  <div className="w-full aspect-video object-cover rounded border-2 border-[var(--color-brand-border)] group-hover:scale-102 transition-transform duration-300 bg-neutral-100 flex items-center justify-center">
+                    <span className="text-4xl text-[var(--color-brand-red)]">✦</span>
+                  </div>
+                )}
                 </Link>
                 <span className="text-[var(--color-brand-red)] font-bold text-xs uppercase mb-1 block">
                   {item.category}
@@ -157,9 +135,9 @@ export default function ArticlesPage() {
               </div>
             </article>
           ))}
-          {filteredItems.length === 0 && (
+          {items !== null && filteredItems.length === 0 && (
             <div className="col-span-full py-12 text-center text-black font-medium text-lg">
-              No articles found in this category.
+              {items.length === 0 ? "No articles published yet." : "No articles found in this category."}
             </div>
           )}
         </div>

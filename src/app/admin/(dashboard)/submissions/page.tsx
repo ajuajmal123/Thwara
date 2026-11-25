@@ -1,27 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { AdminRow } from "@/types/admin";
+import { errorMessage } from "@/lib/errors";
 import { getAdminSubmissions, updateSubmissionStatusAction } from "../../actions";
 
 export default function AdminSubmissionsPage() {
-  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<AdminRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const STATUSES = ["All", "Pending", "Under Review", "Accepted", "Rejected"];
 
-  const fetchSubmissions = async () => {
-    setLoading(true);
-    try {
-      const data = await getAdminSubmissions();
-      setSubmissions(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchSubmissions = () =>
+    getAdminSubmissions()
+      .then((data) => {
+        setSubmissions(data);
+      })
+      .catch((err) => console.error("[Submissions Fetch Error]:", err))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
     fetchSubmissions();
@@ -34,8 +32,8 @@ export default function AdminSubmissionsPage() {
       setSubmissions((prev) =>
         prev.map((sub) => (sub.id === id ? { ...sub, status: newStatus } : sub))
       );
-    } catch (err: any) {
-      alert("Failed to update status: " + err.message);
+    } catch (err) {
+      alert("Failed to update status: " + errorMessage(err));
     } finally {
       setUpdatingId(null);
     }
@@ -122,11 +120,11 @@ export default function AdminSubmissionsPage() {
             >
               <div className="flex flex-col gap-2 max-w-2xl">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getStatusBadge(item.status)}`}>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getStatusBadge(item.status ?? "Pending")}`}>
                     {item.status || "Pending"}
                   </span>
                   <span className="text-xs text-neutral-400 font-medium">
-                    Submitted on {new Date(item.created_at).toLocaleDateString()}
+                    Submitted on {item.created_at ? new Date(item.created_at).toLocaleDateString() : "unknown date"}
                   </span>
                 </div>
 
@@ -187,7 +185,7 @@ export default function AdminSubmissionsPage() {
                   {["Pending", "Under Review", "Accepted", "Rejected"].map((st) => (
                     <button
                       key={st}
-                      onClick={() => handleStatusChange(item.id, st)}
+                      onClick={() => handleStatusChange(String(item.id), st)}
                       disabled={updatingId === item.id || item.status === st}
                       className={`text-xs px-2.5 py-1 rounded font-bold border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                         item.status === st

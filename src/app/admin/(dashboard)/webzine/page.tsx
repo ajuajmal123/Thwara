@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import type { AdminRecord, AdminRow } from "@/types/admin";
+import { errorMessage } from "@/lib/errors";
 import {
   getAdminWebzines,
   saveWebzineAction,
@@ -24,14 +25,14 @@ const DOMAINS = [
 ];
 
 export default function AdminWebzinePage() {
-  const [webzines, setWebzines] = useState<any[]>([]);
-  const [allArticles, setAllArticles] = useState<any[]>([]);
-  const [allFictions, setAllFictions] = useState<any[]>([]);
-  const [allFolklores, setAllFolklores] = useState<any[]>([]);
-  const [allTellings, setAllTellings] = useState<any[]>([]);
+  const [webzines, setWebzines] = useState<AdminRow[]>([]);
+  const [allArticles, setAllArticles] = useState<AdminRow[]>([]);
+  const [allFictions, setAllFictions] = useState<AdminRow[]>([]);
+  const [allFolklores, setAllFolklores] = useState<AdminRow[]>([]);
+  const [allTellings, setAllTellings] = useState<AdminRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [editingItem, setEditingItem] = useState<AdminRecord | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -52,27 +53,23 @@ export default function AdminWebzinePage() {
   const [curationTab, setCurationTab] = useState<"articles" | "fictions" | "folklores" | "tellings">("articles");
   const [curationSearch, setCurationSearch] = useState("");
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [wData, artData, ficData, folData, telData] = await Promise.all([
-        getAdminWebzines(),
-        getAdminArticles(),
-        getAdminFictions(),
-        getAdminFolklores(),
-        getAdminTellings(),
-      ]);
-      setWebzines(wData);
-      setAllArticles(artData);
-      setAllFictions(ficData);
-      setAllFolklores(folData);
-      setAllTellings(telData);
-    } catch (err) {
-      console.error("[Webzine Data Load Error]:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchData = () =>
+    Promise.all([
+      getAdminWebzines(),
+      getAdminArticles(),
+      getAdminFictions(),
+      getAdminFolklores(),
+      getAdminTellings(),
+    ])
+      .then(([wData, artData, ficData, folData, telData]) => {
+        setWebzines(wData);
+        setAllArticles(artData);
+        setAllFictions(ficData);
+        setAllFolklores(folData);
+        setAllTellings(telData);
+      })
+      .catch((err) => console.error("[Webzine Data Load Error]:", err))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
     fetchData();
@@ -97,7 +94,7 @@ export default function AdminWebzinePage() {
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (item: any) => {
+  const handleOpenEdit = (item: AdminRow) => {
     setEditingItem(item);
     setTitle(item.title || "");
     setIssueNumber(item.issue_number || "01");
@@ -108,9 +105,9 @@ export default function AdminWebzinePage() {
     setDescription(item.description || "");
 
     // Extract selected IDs (handles either array of IDs or array of objects)
-    const extractIds = (list: any) => {
+    const extractIds = (list: AdminRecord["articles"]) => {
       if (!Array.isArray(list)) return [];
-      return list.map((x: any) => (typeof x === "object" && x !== null ? x.id : x));
+      return list.map((x) => (typeof x === "object" && x !== null ? x.id : x));
     };
 
     setSelectedArticles(extractIds(item.articles));
@@ -128,8 +125,8 @@ export default function AdminWebzinePage() {
       await deleteWebzineAction(id);
       setMessage("Issue deleted successfully.");
       fetchData();
-    } catch (err: any) {
-      alert("Failed to delete: " + err.message);
+    } catch (err) {
+      alert("Failed to delete: " + errorMessage(err));
     }
   };
 
@@ -194,8 +191,8 @@ export default function AdminWebzinePage() {
       setIsModalOpen(false);
       setEditingItem(null);
       fetchData();
-    } catch (err: any) {
-      alert("Error saving webzine issue: " + err.message);
+    } catch (err) {
+      alert("Error saving webzine issue: " + errorMessage(err));
     } finally {
       setSubmitting(false);
     }

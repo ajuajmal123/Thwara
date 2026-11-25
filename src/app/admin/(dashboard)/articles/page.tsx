@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { AdminRecord, AdminRow } from "@/types/admin";
+import { errorMessage } from "@/lib/errors";
 import Link from "next/link";
 import { getAdminArticles, saveArticleAction, deleteArticleAction, getAdminAuthors } from "../../actions";
 import { generateSlug } from "@/lib/slug";
@@ -9,10 +11,10 @@ import AdditionalImagesInput from "@/components/admin/AdditionalImagesInput";
 import DirectMediaUpload from "@/components/admin/DirectMediaUpload";
 
 export default function AdminArticlesPage() {
-  const [articles, setArticles] = useState<any[]>([]);
-  const [authors, setAuthors] = useState<any[]>([]);
+  const [articles, setArticles] = useState<AdminRow[]>([]);
+  const [authors, setAuthors] = useState<AdminRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingArticle, setEditingArticle] = useState<any | null>(null);
+  const [editingArticle, setEditingArticle] = useState<AdminRecord | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -39,21 +41,17 @@ export default function AdminArticlesPage() {
     "Memoir",
   ];
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [articlesData, authorsData] = await Promise.all([
-        getAdminArticles(),
-        getAdminAuthors(),
-      ]);
-      setArticles(articlesData);
-      setAuthors(authorsData);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchData = () =>
+    Promise.all([
+      getAdminArticles(),
+      getAdminAuthors(),
+    ])
+      .then(([articlesData, authorsData]) => {
+        setArticles(articlesData);
+        setAuthors(authorsData);
+      })
+      .catch((err) => console.error("[Articles Fetch Error]:", err))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
     fetchData();
@@ -71,7 +69,7 @@ export default function AdminArticlesPage() {
     setIsFormOpen(true);
   };
 
-  const handleOpenEdit = (art: any) => {
+  const handleOpenEdit = (art: AdminRow) => {
     setEditingArticle(art);
     setTitle(art.title || "");
     setAuthorName(art.author_name || (authors[0]?.name || ""));
@@ -89,8 +87,8 @@ export default function AdminArticlesPage() {
       await deleteArticleAction(id);
       setMessage("Article deleted successfully.");
       fetchData();
-    } catch (err: any) {
-      alert("Failed to delete: " + err.message);
+    } catch (err) {
+      alert("Failed to delete: " + errorMessage(err));
     }
   };
 
@@ -125,8 +123,8 @@ export default function AdminArticlesPage() {
       setIsFormOpen(false);
       setEditingArticle(null);
       fetchData();
-    } catch (err: any) {
-      alert("Error saving article: " + err.message);
+    } catch (err) {
+      alert("Error saving article: " + errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -229,7 +227,7 @@ export default function AdminArticlesPage() {
                       >
                         <option value="">-- Choose Author from Directory --</option>
                         {authors.map((a) => (
-                          <option key={a.id} value={a.name}>
+                          <option key={a.id} value={a.name ?? ""}>
                             {a.name}
                           </option>
                         ))}
@@ -333,7 +331,7 @@ export default function AdminArticlesPage() {
           <div className="p-12 text-center flex flex-col items-center gap-3">
             <span className="text-4xl">📄</span>
             <span className="text-sm font-bold text-neutral-700">No articles found in database.</span>
-            <p className="text-xs text-neutral-400">Click "+ Write New Article" to add your first post.</p>
+            <p className="text-xs text-neutral-400">Click &ldquo;+ Write New Article&rdquo; to add your first post.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { errorMessage } from "@/lib/errors";
 import Image from "next/image";
 import { loginAdminAction } from "../actions";
 
@@ -20,9 +22,9 @@ export default function AdminLoginPage() {
         setError(res.error);
         setIsSubmitting(false);
       }
-    } catch (err: any) {
+    } catch (err) {
       // In Next.js redirect() throws an internal NEXT_REDIRECT error which is expected
-      if (err?.message?.includes("NEXT_REDIRECT")) return;
+      if (errorMessage(err, "").includes("NEXT_REDIRECT")) return;
       setError("An unexpected error occurred. Please try again.");
       setIsSubmitting(false);
     }
@@ -77,12 +79,12 @@ export default function AdminLoginPage() {
         </form>
 
         <div className="mt-8 pt-6 border-t border-neutral-200 w-full text-center">
-          <a
+          <Link
             href="/"
             className="text-xs font-bold text-neutral-500 hover:text-[var(--color-brand-red)] transition-colors inline-flex items-center gap-1"
           >
             ← Back to Public Website
-          </a>
+          </Link>
         </div>
       </div>
     </div>

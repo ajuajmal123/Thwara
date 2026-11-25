@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { AdminRecord, AdminRow } from "@/types/admin";
+import { errorMessage } from "@/lib/errors";
 import Link from "next/link";
 import {
   getAdminFictions,
@@ -18,12 +20,12 @@ import DirectMediaUpload from "@/components/admin/DirectMediaUpload";
 
 export default function AdminFictionPage() {
   const [activeTab, setActiveTab] = useState<"fiction" | "folklore">("fiction");
-  const [fictions, setFictions] = useState<any[]>([]);
-  const [folklores, setFolklores] = useState<any[]>([]);
-  const [authors, setAuthors] = useState<any[]>([]);
+  const [fictions, setFictions] = useState<AdminRow[]>([]);
+  const [folklores, setFolklores] = useState<AdminRow[]>([]);
+  const [authors, setAuthors] = useState<AdminRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [editingItem, setEditingItem] = useState<AdminRecord | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,23 +51,19 @@ export default function AdminFictionPage() {
     "Field notes",
   ];
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const [ficData, folData, authData] = await Promise.all([
-        getAdminFictions(),
-        getAdminFolklores(),
-        getAdminAuthors(),
-      ]);
-      setFictions(ficData);
-      setFolklores(folData);
-      setAuthors(authData);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadData = () =>
+    Promise.all([
+      getAdminFictions(),
+      getAdminFolklores(),
+      getAdminAuthors(),
+    ])
+      .then(([ficData, folData, authData]) => {
+        setFictions(ficData);
+        setFolklores(folData);
+        setAuthors(authData);
+      })
+      .catch((err) => console.error("[Fiction Fetch Error]:", err))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
     loadData();
@@ -85,7 +83,7 @@ export default function AdminFictionPage() {
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (item: any) => {
+  const handleOpenEdit = (item: AdminRow) => {
     setEditingItem(item);
     setTitle(item.title || "");
     const authorVal = activeTab === "fiction" ? item.author_name : item.narrator_name;
@@ -119,8 +117,8 @@ export default function AdminFictionPage() {
       }
       setMessage("Item deleted successfully.");
       loadData();
-    } catch (err: any) {
-      alert("Failed to delete: " + err.message);
+    } catch (err) {
+      alert("Failed to delete: " + errorMessage(err));
     }
   };
 
@@ -171,8 +169,8 @@ export default function AdminFictionPage() {
       setIsModalOpen(false);
       setEditingItem(null);
       loadData();
-    } catch (err: any) {
-      alert("Error saving: " + err.message);
+    } catch (err) {
+      alert("Error saving: " + errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -343,7 +341,7 @@ export default function AdminFictionPage() {
                     >
                       <option value="">-- Choose from Authors Directory --</option>
                       {authors.map((a) => (
-                        <option key={a.id} value={a.name}>
+                        <option key={a.id} value={a.name ?? ""}>
                           {a.name}
                         </option>
                       ))}

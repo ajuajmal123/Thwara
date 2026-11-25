@@ -9,7 +9,7 @@ export async function submitPitchAction(formData: FormData) {
     throw new Error("Supabase is not configured. Please check your backend credentials.");
   }
 
-  let payload = {
+  const payload = {
     authorName: "Anonymous",
     email: null as string | null,
     title: "Untitled Submission",
@@ -62,8 +62,8 @@ export async function submitPitchAction(formData: FormData) {
       if (
         uploadError &&
         (uploadError.message?.includes("Bucket not found") ||
-          (uploadError as any).statusCode === "404" ||
-          (uploadError as any).status === 404)
+          (uploadError as { statusCode?: string }).statusCode === "404" ||
+          (uploadError as { status?: number }).status === 404)
       ) {
         await supabase.storage.createBucket("submissions", { public: true });
         const retry = await supabase.storage.from("submissions").upload(path, buffer, {

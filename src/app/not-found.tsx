@@ -24,7 +24,7 @@ export default function NotFound() {
                 </h2>
 
                 <p className="text-[15px] leading-relaxed text-[var(--color-brand-gray)] mb-16">
-                    The page you're looking for could not be found. It may have been relocated to the archive or permanently removed.
+                    The page you&apos;re looking for could not be found. It may have been relocated to the archive or permanently removed.
                 </p>
 
                 <Link href="/" className="inline-flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-[var(--color-brand-black)] hover:text-[var(--color-brand-red)] transition-all group">

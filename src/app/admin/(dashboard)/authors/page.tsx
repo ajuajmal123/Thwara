@@ -1,27 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { AdminRecord, AdminRow } from "@/types/admin";
+import { errorMessage } from "@/lib/errors";
 import { getAdminAuthors, saveAuthorAction, deleteAuthorAction } from "../../actions";
 import DirectMediaUpload from "@/components/admin/DirectMediaUpload";
 
 export default function AdminAuthorsPage() {
-  const [authors, setAuthors] = useState<any[]>([]);
+  const [authors, setAuthors] = useState<AdminRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAuthor, setEditingAuthor] = useState<any | null>(null);
+  const [editingAuthor, setEditingAuthor] = useState<AdminRecord | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchAuthors = async () => {
-    setLoading(true);
-    try {
-      const data = await getAdminAuthors();
-      setAuthors(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchAuthors = () =>
+    getAdminAuthors()
+      .then((data) => {
+        setAuthors(data);
+      })
+      .catch((err) => console.error("[Authors Fetch Error]:", err))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
     fetchAuthors();
@@ -36,7 +34,7 @@ export default function AdminAuthorsPage() {
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (author: any) => {
+  const handleOpenEdit = (author: AdminRow) => {
     setEditingAuthor(author);
     setIsModalOpen(true);
   };
@@ -46,8 +44,8 @@ export default function AdminAuthorsPage() {
     try {
       await deleteAuthorAction(id);
       fetchAuthors();
-    } catch (err: any) {
-      alert("Failed to delete: " + err.message);
+    } catch (err) {
+      alert("Failed to delete: " + errorMessage(err));
     }
   };
 
@@ -59,15 +57,15 @@ export default function AdminAuthorsPage() {
     try {
       await saveAuthorAction({
         id: editingAuthor?.id || undefined,
-        name: formData.get("name"),
-        photo: formData.get("photo"),
-        description: formData.get("description"),
+        name: String(formData.get("name") ?? ""),
+        photo: String(formData.get("photo") ?? ""),
+        description: String(formData.get("description") ?? ""),
       });
       setIsModalOpen(false);
       setEditingAuthor(null);
       fetchAuthors();
-    } catch (err: any) {
-      alert("Error saving author: " + err.message);
+    } catch (err) {
+      alert("Error saving author: " + errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -110,7 +108,7 @@ export default function AdminAuthorsPage() {
                   type="text"
                   name="name"
                   required
-                  defaultValue={editingAuthor.name}
+                  defaultValue={editingAuthor.name ?? ""}
                   placeholder="e.g. Athira Bhanu"
                   className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
                 />
@@ -130,7 +128,7 @@ export default function AdminAuthorsPage() {
                 <textarea
                   name="description"
                   rows={4}
-                  defaultValue={editingAuthor.description}
+                  defaultValue={editingAuthor.description ?? ""}
                   placeholder="Writer, essayist and researcher exploring..."
                   className="w-full px-3 py-2 border-2 border-neutral-300 rounded font-normal text-sm focus:border-[var(--color-brand-green)] outline-none"
                 />
@@ -170,11 +168,17 @@ export default function AdminAuthorsPage() {
               className="bg-white border-2 border-[var(--color-brand-border)] rounded-xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex items-start gap-4">
-                <img
-                  src={author.photo || `https://picsum.photos/seed/${encodeURIComponent(author.name)}/100/100`}
-                  alt=""
-                  className="w-16 h-16 rounded-full object-cover border-2 border-[var(--color-brand-border)] shrink-0"
-                />
+                {author.photo ? (
+                  <img
+                    src={author.photo}
+                    alt=""
+                    className="w-16 h-16 rounded-full object-cover border-2 border-[var(--color-brand-border)] shrink-0"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-neutral-100 border-2 border-[var(--color-brand-border)] shrink-0 flex items-center justify-center text-xl font-bold text-[var(--color-brand-red)]">
+                    {(author.name || "?").charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div className="flex flex-col gap-1">
                   <h2 className="text-base font-bold text-black">{author.name}</h2>
                   <p className="text-xs text-neutral-600 line-clamp-3 leading-relaxed">{author.description}</p>

@@ -13,7 +13,7 @@ export function getStrapiURL(path = "") {
     return `${process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://127.0.0.1:1337"}${path}`;
 }
 
-export async function fetchAPI(path: string, _urlParamsObject = {}, _options: any = {}) {
+export async function fetchAPI(path: string) {
     console.warn(`[API] Legacy fetchAPI called for: ${path}. Transitioning to Supabase.`);
     return { data: [] };
 }

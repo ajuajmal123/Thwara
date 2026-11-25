@@ -8,40 +8,35 @@ import { searchAllContent, SearchResultItem } from "@/services/supabaseServices"
 function SearchContent() {
     const searchParams = useSearchParams();
     const query = searchParams.get("q") || "";
-    const [results, setResults] = useState<SearchResultItem[]>([]);
-    const [searching, setSearching] = useState(false);
+    const trimmed = query.trim();
+    // Results are stored together with the query they belong to, so "searching"
+    // and stale results can be derived during render instead of set in the effect.
+    const [found, setFound] = useState<{ query: string; items: SearchResultItem[] }>({ query: "", items: [] });
 
     // Perform search whenever query from navbar changes
     useEffect(() => {
-        const trimmed = query.trim();
-        if (!trimmed) {
-            setResults([]);
-            return;
-        }
+        if (!trimmed) return;
 
         let isCurrent = true;
-        setSearching(true);
-
-        const debounceTimer = setTimeout(async () => {
-            try {
-                const data = await searchAllContent(trimmed);
-                if (isCurrent) {
-                    setResults(data);
-                }
-            } catch (err) {
-                console.error("Search error:", err);
-            } finally {
-                if (isCurrent) {
-                    setSearching(false);
-                }
-            }
+        const debounceTimer = setTimeout(() => {
+            searchAllContent(trimmed)
+                .catch((err) => {
+                    console.error("Search error:", err);
+                    return [] as SearchResultItem[];
+                })
+                .then((items) => {
+                    if (isCurrent) setFound({ query: trimmed, items });
+                });
         }, 100);
 
         return () => {
             isCurrent = false;
             clearTimeout(debounceTimer);
         };
-    }, [query]);
+    }, [trimmed]);
+
+    const searching = trimmed !== "" && found.query !== trimmed;
+    const results = trimmed !== "" && found.query === trimmed ? found.items : [];
 
     // Separate into contributors and publications (matching original layout)
     const contributorResults = results.filter((item) => item.origin === "Author");

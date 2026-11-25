@@ -183,39 +183,3 @@ CREATE POLICY "Public read submissions"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'submissions');
 
--- ==============================================================================
--- 6. INITIAL SEED DATA
--- ==============================================================================
-
--- Authors
-INSERT INTO public.authors (name, photo, description) VALUES
-('Athira Bhanu', '/athirabhanu.jpeg', 'Writer and consultant psychologist exploring emotional landscapes of human experience and sociocultural realities.'),
-('Ananya Menon', 'https://picsum.photos/seed/ananya/300/300', 'Cultural historian and essayist documenting post-colonial memory.'),
-('Muhammad Riyas', 'https://picsum.photos/seed/riyas/300/300', 'Researcher in critical archival studies and literary movements.'),
-('Rahul Krishnan', 'https://picsum.photos/seed/rahul/300/300', 'Visual artist and writer exploring the ecology of the Malabar coast.')
-ON CONFLICT DO NOTHING;
-
--- Articles
-INSERT INTO public.articles (slug, title, subheading, author_name, domain, date, cover_image, content) VALUES
-('remembering-the-city', 'Who Gets to Remember a City?', 'Exploring the uneven preservation of urban geographies and collective memory.', 'Ananya Menon', 'Essays', '2026-08-22', 'https://picsum.photos/seed/art1/800/500', 'Full essay on urban geographies and collective memory in modern South Asia.'),
-('archive-never-neutral', 'The Archive Is Never Neutral', 'An investigation into archival structures that inherently silence marginalized narratives.', 'Muhammad Riyas', 'History', '2026-08-18', 'https://picsum.photos/seed/art2/800/500', 'Detailed critique of colonial documentary gaps and community history.'),
-('beyond-boundaries-of-language', 'ഭാഷയുടെ അതിരുകൾക്കപ്പുറം', 'ഭാഷയുടെ ഘടനകൾ എങ്ങനെയാണ് നമ്മുടെ ചിന്താഗതികളെ അതിരിടുന്നത് എന്നതിനെക്കുറിച്ചുള്ള ഒരു പഠനം.', 'Fathima N.', 'Literature', '2026-08-15', 'https://picsum.photos/seed/art3/800/500', 'ഭാഷയുടെയും സാംസ്കാരിക പ്രതിനിധാനങ്ങളുടെയും വിമർശനാത്മക വായന.')
-ON CONFLICT (slug) DO NOTHING;
-
--- Fictions
-INSERT INTO public.fictions (slug, title, subheading, author_name, genre, date, cover_image, notes) VALUES
-('midnight-city', 'Midnight City', 'An evocative tale blurring reality and dreamscape.', 'Leena Mathew', 'Story', '2026-09-12', 'https://picsum.photos/seed/fic1/800/500', 'First serialized in Thwara Issue #1'),
-('letters-never-sent', 'Letters Never Sent', 'Unopened envelopes in an attic sealed with red wax.', 'Meera Menon', 'Story', '2026-08-30', 'https://picsum.photos/seed/fic2/800/500', 'Winner of the Short Fiction Spotlight')
-ON CONFLICT (slug) DO NOTHING;
-
--- Folklores
-INSERT INTO public.folklores (slug, title, subheading, narrator_name, category, date, cover_image, spotify_url) VALUES
-('waves-and-ancestors', 'Waves and Ancestors', 'Oral histories from fishing communities across the Arabian Sea.', 'Devanadan K.', 'Oral Histories', '2026-09-01', 'https://picsum.photos/seed/folk1/800/500', 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M'),
-('the-silent-grove', 'The Silent Sacred Grove', 'Sacred groves (Kavu) and their totemic mythologies.', 'Saraswathi Amma', 'Myths', '2026-08-20', 'https://picsum.photos/seed/folk2/800/500', NULL)
-ON CONFLICT (slug) DO NOTHING;
-
--- Webzines
-INSERT INTO public.webzines (slug, title, webzine_name, issue_number, domain, date, cover_image, excerpt) VALUES
-('monsoon-notes', 'Monsoon Notes', 'Issue 01: Monsoon Notes', '01', 'Visual Essay', 'Oct 2026', 'https://picsum.photos/seed/webz1/600/800', 'An episodic visual and textual exploration of how heavy rains architect psychological interiority.'),
-('city-in-fragments', 'A City in Fragments', 'Issue 02: A City in Fragments', '02', 'Digital Storytelling', 'Sep 2026', 'https://picsum.photos/seed/webz2/600/800', 'Discarded auditory artifacts and broken neon vernaculars of dying industrial sectors.')
-ON CONFLICT (slug) DO NOTHING;

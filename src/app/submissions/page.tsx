@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { errorMessage as toMessage } from "@/lib/errors";
 import { submitPitchAction } from "./actions";
 
 export default function SubmissionsPage() {
@@ -51,10 +52,10 @@ export default function SubmissionsPage() {
 
             await submitPitchAction(formData);
             setSubmitted(true);
-        } catch (err: any) {
+        } catch (err) {
             console.error("Submission failed:", err);
             setErrorMessage(
-                err?.message || "Failed to send submission. Please try again or check your backend connection."
+                toMessage(err, "Failed to send submission. Please try again or check your backend connection.")
             );
         } finally {
             setIsSubmitting(false);
@@ -254,7 +255,7 @@ export default function SubmissionsPage() {
                                     onChange={(e) => setGoogleDriveLink(e.target.value)}
                                     className="w-full border-2 border-[var(--color-brand-border)] rounded px-4 py-3 text-black focus:outline-none focus:border-[var(--color-brand-red)] transition-colors"
                                 />
-                                <p className="text-xs text-gray-500 font-medium">Please ensure the link access is set to "Anyone with the link can view".</p>
+                                <p className="text-xs text-gray-500 font-medium">Please ensure the link access is set to &ldquo;Anyone with the link can view&rdquo;.</p>
                             </div>
 
                             <div className="flex items-center gap-2 mt-2">

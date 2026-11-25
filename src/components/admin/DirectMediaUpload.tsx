@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import { errorMessage as toMessage } from "@/lib/errors";
+import type { MediaFile } from "@/types/admin";
 import { uploadMediaAction, listMediaFilesAction } from "@/app/admin/actions";
 
 interface DirectMediaUploadProps {
@@ -29,7 +31,7 @@ export default function DirectMediaUpload({
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
-  const [libraryFiles, setLibraryFiles] = useState<any[]>([]);
+  const [libraryFiles, setLibraryFiles] = useState<MediaFile[]>([]);
   const [libraryLoading, setLibraryLoading] = useState(false);
   const [librarySearch, setLibrarySearch] = useState("");
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -55,8 +57,8 @@ export default function DirectMediaUpload({
       } else {
         throw new Error("No URL returned from upload server action");
       }
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to upload file to storage.");
+    } catch (err) {
+      setErrorMessage(toMessage(err, "Failed to upload file to storage."));
     } finally {
       setUploading(false);
     }

@@ -1,62 +1,79 @@
 // Thwara Platform Data Models
 
-export interface Article {
-  coverImage: string;
-  title: string;
-  authorName: string;
-  domain: "Literature" | "Library" | "Psychology" | "History" | "Politics" | "Culture" | "Fashion" | "Photo story" | "Travelogue" | "Memoir";
-  date: string;
-  subheading: string;
-  additionalImages: string[];
-  authorPhoto: string;
-  authorDescription: string;
-  reference: string;
-}
-
-export interface Folklore {
-  coverImage: string;
-  title: string;
-  narratorName: string;
-  date: string;
-  subheading: string;
-  additionalImages: string[];
-  narratorPhoto: string;
-  narratorDescription: string;
-  category: "Oral Histories" | "Folk Practices" | "Folk Literature" | "Myths" | "Legends" | "Field notes";
-  reference: string;
-  spotifyUrl?: string; // Add optional Spotify embed URL
-}
-
-export interface Fiction {
-  coverImage: string;
-  title: string;
-  authorName: string;
-  genre: "Story" | "Poem" | "Cartoon";
-  date: string;
-  subheading: string;
-  additionalImages: string[];
-  authorPhoto: string;
-  authorDescription: string;
-  notes: string; // Notes / glossary
-}
-
-export interface Webzine {
+/** A work referenced inside a webzine issue (stored as JSONB on `webzines`). */
+export interface CuratedWork {
+  id?: number | string;
+  slug?: string;
   title?: string;
-  webzineName?: string;
-  issueNumber?: string;
-  coverImage?: any;
-  workName?: string;
-  domain?: string;
-  date?: string;
-  excerpt?: string;
-  description?: string;
-  authorName?: string;
-  additionalImages?: any[];
-  // Curated group of existing works inside this issue:
-  articles?: any;
-  fictions?: any;
-  folklores?: any;
-  tellings?: any;
+  author?: string;
+  narrator?: string;
+  genre?: string;
+  category?: string;
+}
+
+/**
+ * A row from any Supabase content table (articles, fictions, folklores,
+ * webzines, tellings, authors) after `normalizeEntity`. Columns differ per
+ * table, so everything except `id` is optional. camelCase aliases mirror the
+ * snake_case columns for older callers, and `attributes` repeats the row in
+ * the legacy Strapi shape.
+ */
+export interface ContentRow {
+  id: number;
+  slug?: string | null;
+  title?: string | null;
+  subheading?: string | null;
+  content?: string | null;
+  date?: string | null;
+  created_at?: string | null;
+
+  domain?: string | null;
+  genre?: string | null;
+  category?: string | null;
+
+  author_name?: string | null;
+  authorName?: string | null;
+  author_photo?: string | null;
+  authorPhoto?: string | null;
+  author_description?: string | null;
+  authorDescription?: string | null;
+
+  narrator_name?: string | null;
+  narratorName?: string | null;
+  narrator_photo?: string | null;
+  narratorPhoto?: string | null;
+  narrator_description?: string | null;
+  narratorDescription?: string | null;
+
+  cover_image?: string | null;
+  coverImage?: { url?: string | null } | null;
+  additional_images?: string[] | null;
+
+  reference?: string | null;
+  notes?: string | null;
+  spotify_url?: string | null;
+  spotifyUrl?: string | null;
+  audio_url?: string | null;
+
+  webzine_name?: string | null;
+  webzineName?: string | null;
+  issue_number?: string | null;
+  issueNumber?: string | null;
+  work_name?: string | null;
+  workName?: string | null;
+  excerpt?: string | null;
+  description?: string | null;
+  articles?: CuratedWork[] | null;
+  fictions?: CuratedWork[] | null;
+  folklores?: CuratedWork[] | null;
+  tellings?: CuratedWork[] | null;
+
+  // authors table
+  name?: string | null;
+  photo?: string | null;
+  bio?: string | null;
+
+  attributes?: ContentRow;
 }
 
 export interface Submission {
@@ -64,33 +81,13 @@ export interface Submission {
   email?: string;
   title?: string;
   googleDriveLink?: string;
-  document?: any;
-  agreedToPrivacy: boolean;
-  status?: "Pending" | "Under Review" | "Accepted" | "Rejected";
+  agreedToPrivacy?: boolean;
+  status?: "Pending" | "Under Review" | "Accepted" | "Rejected" | string;
 }
 
-export interface Author {
-  name: string;
-  photo: string;
-  description: string;
-}
-
-export interface Tellings {
-  title: string;
-  coverImage?: string;
-  category: "Stories" | "Interview" | "Podcast";
-  spotifyUrl?: string; // Add optional Spotify embed URL
-  // include other properties as required e.g., audioUrl, date, author
-}
-
-// Strapi Response Wrappers
-export interface StrapiEntity<T> {
-  id: number;
-  attributes: T;
-}
-
-export interface StrapiCollectionResponse<T> {
-  data: StrapiEntity<T>[];
+// Response wrappers (shape kept from the Strapi era so callers stay unchanged)
+export interface CollectionResponse {
+  data: ContentRow[];
   meta: {
     pagination: {
       page: number;
@@ -101,6 +98,6 @@ export interface StrapiCollectionResponse<T> {
   };
 }
 
-export interface StrapiSingleResponse<T> {
-  data: StrapiEntity<T>;
+export interface SingleResponse {
+  data: ContentRow;
 }

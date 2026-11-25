@@ -39,7 +39,7 @@ export default function MeaningSection() {
                         <span className="text-[10px] font-bold text-[var(--color-brand-red)] w-4 font-serif">2.</span>
                         <div className="flex flex-col gap-3">
                             <span className="text-lg md:text-2xl font-serif text-neutral-300 italic max-w-md">
-                                "An urge to explore, to act, to create."
+                                &ldquo;An urge to explore, to act, to create.&rdquo;
                             </span>
                             <p className="text-[13px] md:text-sm leading-relaxed text-neutral-400 max-w-md mt-4 border-l-[0.5px] border-neutral-800 pl-4 py-1">
                                 We come together with that same urge: to think, write, and reimagine the world. Our spaces are built for critical engagement and cultural reflection.

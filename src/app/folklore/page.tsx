@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getFolklore } from "@/services/supabaseServices";
+import { fieldsOf, coverOf, snippetOf } from "@/lib/content";
 
 const CATEGORIES = [
   "All",
@@ -14,76 +15,50 @@ const CATEGORIES = [
   "Field notes",
 ];
 
+interface FolkloreItem {
+  id: number;
+  category: string;
+  title: string;
+  narrator: string;
+  coverImage: string;
+  spotifyUrl: string | null;
+  snippet: string;
+  slug: string;
+}
+
 export default function FolklorePage() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [items, setItems] = useState<any[]>([
-    {
-      id: 1,
-      category: "Oral Histories",
-      title: "The Legend of the Coast",
-      narrator: "Thwara Archive",
-      coverImage: "https://picsum.photos/seed/folklore_pg1/800/400",
-      spotifyUrl: "https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5?utm_source=generator&theme=0",
-      slug: "1",
-      snippet: "Exploring stories rooted deeply in local tradition, investigating meaning that transcended generations.",
-    },
-    {
-      id: 2,
-      category: "Myths",
-      title: "Ancient Songs of the Valley",
-      narrator: "Thwara Archive",
-      coverImage: "https://picsum.photos/seed/folklore_pg2/800/400",
-      spotifyUrl: null,
-      slug: "2",
-      snippet: "Documenting sacred narratives and community oral transmissions from older storytellers.",
-    },
-  ]);
+  const [items, setItems] = useState<FolkloreItem[] | null>(null);
 
   useEffect(() => {
-    async function fetchLiveFolklore() {
-      try {
-        const res = await getFolklore(1, 50);
-        if (res?.data && res.data.length > 0) {
-          const mapped = res.data.map((entity: any) => {
-            const attr = entity.attributes || entity;
-            const cover =
-              attr.cover_image ||
-              attr.coverImage?.url ||
-              `https://picsum.photos/seed/folklore${entity.id}/800/400`;
-
-            const snippet =
-              attr.reference ||
-              (attr.content
-                ? attr.content
-                    .replace(/[#*`>_\[\]\(\)]/g, "")
-                    .trim()
-                    .slice(0, 140) + "..."
-                : "Documenting oral histories, community narratives, and cultural traditions.");
-
+    getFolklore(1, 50)
+      .then((res) => {
+        setItems(
+          (res?.data ?? []).map((entity) => {
+            const attr = fieldsOf(entity);
             return {
               id: entity.id,
               category: attr.category || "Oral Histories",
               title: attr.title || `Folklore Entry #${entity.id}`,
               narrator: attr.narrator_name || attr.narratorName || "Thwara Archive",
-              coverImage: cover,
+              coverImage: coverOf(attr),
               spotifyUrl: attr.spotify_url || attr.spotifyUrl || null,
-              snippet,
+              snippet: attr.reference || snippetOf(attr.content),
               slug: attr.slug || String(entity.id),
             };
-          });
-          setItems(mapped);
-        }
-      } catch (err) {
-        console.log("Using static folklore as fallback", err);
-      }
-    }
-    fetchLiveFolklore();
+          })
+        );
+      })
+      .catch((err) => {
+        console.error("[FolklorePage] Failed to load:", err);
+        setItems([]);
+      });
   }, []);
 
   const filteredItems =
     activeCategory === "All"
-      ? items
-      : items.filter((item) => item.category === activeCategory);
+      ? items ?? []
+      : (items ?? []).filter((item) => item.category === activeCategory);
 
   return (
     <main className="w-full max-w-[1400px] mx-auto px-4 py-8 flex flex-col bg-white">
@@ -121,12 +96,18 @@ export default function FolklorePage() {
               className="flex flex-col border-2 border-[var(--color-brand-border)] rounded overflow-hidden group bg-white shadow-sm hover:shadow-md transition-shadow justify-between"
             >
               <Link href={`/folklore/${item.slug}`} className="block overflow-hidden">
-                <img
-                  src={item.coverImage}
-                  className="w-full aspect-video object-cover border-b-2 border-[var(--color-brand-border)] group-hover:scale-102 transition-transform duration-300"
-                  loading="lazy"
-                  alt={item.title}
-                />
+{item.coverImage ? (
+                  <img
+                    src={item.coverImage}
+                    className="w-full aspect-video object-cover border-b-2 border-[var(--color-brand-border)] group-hover:scale-102 transition-transform duration-300"
+                    loading="lazy"
+                    alt={item.title}
+                  />
+                ) : (
+                  <div className="w-full aspect-video object-cover border-b-2 border-[var(--color-brand-border)] group-hover:scale-102 transition-transform duration-300 bg-neutral-100 flex items-center justify-center">
+                    <span className="text-4xl text-[var(--color-brand-red)]">✦</span>
+                  </div>
+                )}
               </Link>
 
               <div className="p-6 bg-white flex flex-col h-full gap-4">
@@ -173,9 +154,9 @@ export default function FolklorePage() {
               </div>
             </article>
           ))}
-          {filteredItems.length === 0 && (
+          {items !== null && filteredItems.length === 0 && (
             <div className="col-span-full py-12 text-center text-black font-medium text-lg">
-              No items found in {activeCategory}.
+              {items.length === 0 ? "No folklore published yet." : `No items found in ${activeCategory}.`}
             </div>
           )}
         </div>

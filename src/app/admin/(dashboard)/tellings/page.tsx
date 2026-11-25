@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import type { AdminRecord, AdminRow } from "@/types/admin";
+import { errorMessage } from "@/lib/errors";
 import {
   getAdminTellings,
   saveTellingAction,
@@ -12,12 +13,12 @@ import DirectMediaUpload from "@/components/admin/DirectMediaUpload";
 const CATEGORIES = ["Stories", "Podcast", "Interview"] as const;
 
 export default function AdminTellingsPage() {
-  const [tellings, setTellings] = useState<any[]>([]);
+  const [tellings, setTellings] = useState<AdminRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [editingItem, setEditingItem] = useState<AdminRecord | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -28,17 +29,13 @@ export default function AdminTellingsPage() {
   const [spotifyUrl, setSpotifyUrl] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const data = await getAdminTellings();
-      setTellings(data);
-    } catch (err) {
-      console.error("[Tellings Fetch Error]:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadData = () =>
+    getAdminTellings()
+      .then((data) => {
+        setTellings(data);
+      })
+      .catch((err) => console.error("[Tellings Fetch Error]:", err))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
     loadData();
@@ -54,7 +51,7 @@ export default function AdminTellingsPage() {
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (item: any) => {
+  const handleOpenEdit = (item: AdminRow) => {
     setEditingItem(item);
     setTitle(item.title || "");
     setCategory(item.category || "Stories");
@@ -70,8 +67,8 @@ export default function AdminTellingsPage() {
       await deleteTellingAction(id);
       setMessage("Audio piece deleted successfully.");
       loadData();
-    } catch (err: any) {
-      alert("Failed to delete: " + err.message);
+    } catch (err) {
+      alert("Failed to delete: " + errorMessage(err));
     }
   };
 
@@ -103,8 +100,8 @@ export default function AdminTellingsPage() {
       setIsModalOpen(false);
       setEditingItem(null);
       loadData();
-    } catch (err: any) {
-      alert("Error saving telling: " + err.message);
+    } catch (err) {
+      alert("Error saving telling: " + errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -398,7 +395,7 @@ export default function AdminTellingsPage() {
                     <td className="p-3">
                       <span
                         className={`border px-2 py-0.5 rounded text-[10px] font-bold ${getCategoryBadgeClass(
-                          item.category
+                          item.category ?? ""
                         )}`}
                       >
                         {item.category}

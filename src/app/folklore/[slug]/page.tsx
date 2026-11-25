@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { fieldsOf } from "@/lib/content";
 import { getFolkloreBySlug } from "@/services/supabaseServices";
 import ArticleContentRenderer from "@/components/article/ArticleContentRenderer";
 
@@ -9,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   try {
     const res = await getFolkloreBySlug(slug);
-    const item: any = res?.data?.attributes || res?.data;
+    const item = res?.data ? fieldsOf(res.data) : null;
     if (item) {
       return {
         title: `${item.title} - THWARA Folklore & Oral Histories`,
@@ -29,7 +30,7 @@ export default async function FolkloreDetailPage({
 }) {
   const { slug } = await params;
   const res = await getFolkloreBySlug(slug);
-  const folklore: any = res?.data?.attributes || res?.data;
+  const folklore = res?.data ? fieldsOf(res.data) : null;
 
   if (!folklore) {
     notFound();
@@ -47,7 +48,7 @@ export default async function FolkloreDetailPage({
   const narratorPhoto =
     typeof folklore.narrator_photo === "string"
       ? folklore.narrator_photo
-      : folklore.narratorPhoto?.url || null;
+      : folklore.narratorPhoto || null;
 
   return (
     <main className="w-full max-w-[1000px] mx-auto px-3 sm:px-6 py-6 sm:py-12 flex flex-col bg-white overflow-hidden">
@@ -133,7 +134,7 @@ export default async function FolkloreDetailPage({
           <figure className="w-full max-w-full flex flex-col items-center overflow-hidden">
             <img
               src={coverUrl}
-              alt={folklore.title}
+              alt={folklore.title ?? ""}
               className="w-full max-w-full h-auto max-h-[520px] object-cover rounded-lg border-2 border-[var(--color-brand-border)] shadow-xs"
             />
           </figure>

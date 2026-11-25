@@ -3,63 +3,55 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getWebzines } from "@/services/strapiServices";
-import { WEBZINE_PROJECTS } from "@/data/webzine";
-import { getStrapiMedia } from "@/lib/strapi";
+import { fieldsOf, coverOf } from "@/lib/content";
 
 const CATEGORIES = ["All", "Visual Essay", "Digital Storytelling", "Experimental Archive", "Interactive Essay", "Image + Text", "Collaborative Fiction"];
 
+interface WebzineItem {
+    id: number;
+    category: string;
+    title: string;
+    slug: string;
+    date: string;
+    coverImage: string;
+    worksCount: number;
+}
+
 export default function WebzinePage() {
     const [activeCategory, setActiveCategory] = useState("All");
-    const [items, setItems] = useState<any[]>(() => {
-        return WEBZINE_PROJECTS.map((p, idx) => ({
-            id: p.id,
-            category: p.type,
-            title: p.title,
-            slug: p.slug,
-            date: p.date,
-            coverImage: `https://picsum.photos/seed/webzine_cover${idx + 1}/400/550`,
-            articlesCount: 0,
-        }));
-    });
+    const [items, setItems] = useState<WebzineItem[] | null>(null);
 
     useEffect(() => {
-        async function fetchLiveIssues() {
-            try {
-                const res = await getWebzines();
-                if (res?.data && res.data.length > 0) {
-                    const mapped = res.data.map((entity: any) => {
-                        const attr = entity.attributes || entity;
-                        const coverUrl = attr.cover_image || (attr.coverImage?.data?.attributes?.url
-                            ? getStrapiMedia(attr.coverImage.data.attributes.url)
-                            : `https://picsum.photos/seed/webzine_cover${entity.id}/400/550`);
-
-                        const artCount = Array.isArray(attr.articles) ? attr.articles.length : (attr.articles?.data?.length || 0);
-                        const ficCount = Array.isArray(attr.fictions) ? attr.fictions.length : 0;
-                        const folCount = Array.isArray(attr.folklores) ? attr.folklores.length : 0;
-                        const telCount = Array.isArray(attr.tellings) ? attr.tellings.length : 0;
-                        const totalWorks = artCount + ficCount + folCount + telCount;
+        getWebzines()
+            .then((res) => {
+                setItems(
+                    (res?.data ?? []).map((entity) => {
+                        const attr = fieldsOf(entity);
+                        const worksCount =
+                            (attr.articles?.length ?? 0) +
+                            (attr.fictions?.length ?? 0) +
+                            (attr.folklores?.length ?? 0) +
+                            (attr.tellings?.length ?? 0);
 
                         return {
                             id: entity.id,
                             category: attr.domain || "Visual Essay",
                             title: attr.title || attr.webzine_name || attr.webzineName || attr.workName || `Issue #${entity.id}`,
-                            slug: attr.slug || (entity.id).toString(),
-                            date: attr.date || "2026",
-                            coverImage: coverUrl,
-                            articlesCount: totalWorks,
+                            slug: attr.slug || String(entity.id),
+                            date: attr.date || "",
+                            coverImage: coverOf(attr),
+                            worksCount,
                         };
-                    });
-                    setItems(mapped);
-                }
-            } catch (err) {
-                // Keep default static items gracefully if Strapi is offline or seeding
-                console.log("Using static Webzine issues as fallback");
-            }
-        }
-        fetchLiveIssues();
+                    })
+                );
+            })
+            .catch((err) => {
+                console.error("[WebzinePage] Failed to load webzines:", err);
+                setItems([]);
+            });
     }, []);
 
-    const filteredItems = activeCategory === "All" ? items : items.filter(item => item.category === activeCategory);
+    const filteredItems = activeCategory === "All" ? items ?? [] : (items ?? []).filter(item => item.category === activeCategory);
 
     return (
         <main className="w-full max-w-[1400px] mx-auto px-4 py-8 flex flex-col bg-white">
@@ -86,22 +78,28 @@ export default function WebzinePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredItems.map((item) => (
                         <div key={item.id} className="flex flex-col items-center p-4 border-2 border-[var(--color-brand-border)] rounded bg-white shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
-                            <img src={item.coverImage} className="w-full aspect-[3/4] object-cover border-2 border-black rounded shadow" loading="lazy" alt={item.title} />
+                            {item.coverImage ? (
+                                <img src={item.coverImage} className="w-full aspect-[3/4] object-cover border-2 border-black rounded shadow" loading="lazy" alt={item.title} />
+                            ) : (
+                                <div className="w-full aspect-[3/4] bg-neutral-100 border-2 border-black rounded shadow flex items-center justify-center">
+                                    <span className="text-5xl text-[var(--color-brand-red)]">✦</span>
+                                </div>
+                            )}
                             <span className="text-[var(--color-brand-red)] font-bold text-[10px] uppercase mt-2 tracking-widest">{item.category}</span>
                             <h2 className="text-xl font-bold text-black mt-2 text-center line-clamp-1">{item.title}</h2>
                             <p className="text-black font-medium text-xs mt-1 mb-4">{item.date}</p>
 
                             <Link
-                                href={`/webzine/${item.slug || "monsoon-notes"}`}
+                                href={`/webzine/${item.slug}`}
                                 className="w-full border-2 border-[var(--color-brand-red)] text-black py-2 rounded text-sm font-bold hover:bg-[var(--color-brand-red)] hover:text-white transition-colors uppercase text-center block"
                             >
-                                {item.articlesCount > 0 ? `Read Online (${item.articlesCount} Works)` : "Read Online"}
+                                {item.worksCount > 0 ? `Read Online (${item.worksCount} Works)` : "Read Online"}
                             </Link>
                         </div>
                     ))}
-                    {filteredItems.length === 0 && (
+                    {items !== null && filteredItems.length === 0 && (
                         <div className="col-span-full py-12 text-center text-black font-medium text-lg">
-                            No webzine project found in {activeCategory}.
+                            {items.length === 0 ? "No webzine issues published yet." : `No webzine project found in ${activeCategory}.`}
                         </div>
                     )}
                 </div>

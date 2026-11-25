@@ -3,81 +3,54 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getFictions } from "@/services/supabaseServices";
+import { fieldsOf, coverOf, snippetOf } from "@/lib/content";
 
 const CATEGORIES = ["All", "Story", "Poem", "Cartoon"];
 
+interface FictionItem {
+  id: number;
+  type: string;
+  title: string;
+  author: string;
+  coverImage: string;
+  date: string;
+  snippet: string;
+  slug: string;
+}
+
 export default function FictionPage() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [items, setItems] = useState<any[]>([
-    {
-      id: 1,
-      type: "Story",
-      title: "Midnight City",
-      author: "Thwara Collective",
-      coverImage: "https://picsum.photos/seed/fiction_pg1/400/400",
-      date: "2026",
-      slug: "1",
-      snippet:
-        "An evocative tale that explores memory and imagination, blurring the lines between reality and dreamscape.",
-    },
-    {
-      id: 2,
-      type: "Poem",
-      title: "Verses Across the Border",
-      author: "Thwara Collective",
-      coverImage: "https://picsum.photos/seed/fiction_pg2/400/400",
-      date: "2026",
-      slug: "2",
-      snippet:
-        "Poetic reflections delving into the geography of language and community resilience.",
-    },
-  ]);
+  const [items, setItems] = useState<FictionItem[] | null>(null);
 
   useEffect(() => {
-    async function fetchLiveFiction() {
-      try {
-        const res = await getFictions(1, 50);
-        if (res?.data && res.data.length > 0) {
-          const mapped = res.data.map((entity: any) => {
-            const attr = entity.attributes || entity;
-            const cover =
-              attr.cover_image ||
-              attr.coverImage?.url ||
-              `https://picsum.photos/seed/fiction${entity.id}/400/400`;
-
-            const snippet =
-              attr.notes ||
-              (attr.content
-                ? attr.content
-                    .replace(/[#*`>_\[\]\(\)]/g, "")
-                    .trim()
-                    .slice(0, 140) + "..."
-                : "An evocative literary narrative exploring imagination and lived experience.");
-
+    getFictions(1, 50)
+      .then((res) => {
+        setItems(
+          (res?.data ?? []).map((entity) => {
+            const attr = fieldsOf(entity);
             return {
               id: entity.id,
               type: attr.genre || "Story",
               title: attr.title || `Fiction Piece #${entity.id}`,
               author: attr.author_name || attr.authorName || "Thwara Writer",
-              coverImage: cover,
-              date: attr.date || "2026",
-              snippet,
+              coverImage: coverOf(attr),
+              date: attr.date || "",
+              snippet: attr.notes || snippetOf(attr.content),
               slug: attr.slug || String(entity.id),
             };
-          });
-          setItems(mapped);
-        }
-      } catch (err) {
-        console.log("Using static fiction as fallback", err);
-      }
-    }
-    fetchLiveFiction();
+          })
+        );
+      })
+      .catch((err) => {
+        console.error("[FictionPage] Failed to load:", err);
+        setItems([]);
+      });
   }, []);
 
   const filteredItems =
     activeCategory === "All"
-      ? items
-      : items.filter((item) => item.type === activeCategory);
+      ? items ?? []
+      : (items ?? []).filter((item) => item.type === activeCategory);
 
   return (
     <main className="w-full max-w-[1400px] mx-auto px-4 py-8 flex flex-col bg-white">
@@ -112,12 +85,18 @@ export default function FictionPage() {
               className="flex flex-col md:flex-row gap-6 border-2 border-[var(--color-brand-border)] rounded p-5 sm:p-6 bg-white shrink-0 items-center hover:bg-neutral-50/70 transition-colors group"
             >
               <Link href={`/fiction/${item.slug}`} className="w-full md:w-52 aspect-square shrink-0 block overflow-hidden rounded border-2 border-[var(--color-brand-border)]">
-                <img
-                  src={item.coverImage}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                  alt={item.title}
-                />
+{item.coverImage ? (
+                  <img
+                    src={item.coverImage}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    alt={item.title}
+                  />
+                ) : (
+                  <div className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 bg-neutral-100 flex items-center justify-center">
+                    <span className="text-4xl text-[var(--color-brand-red)]">✦</span>
+                  </div>
+                )}
               </Link>
               <div className="flex flex-col text-left justify-center w-full">
                 <span className="text-[var(--color-brand-red)] font-bold text-xs tracking-widest uppercase mb-1">
@@ -133,7 +112,7 @@ export default function FictionPage() {
                 </p>
                 <div className="flex justify-between items-center w-full border-t border-[var(--color-brand-border)] pt-4 mt-auto">
                   <span className="font-bold text-black text-sm">
-                    {item.author} • {item.date}
+                    {item.author}{item.date ? ` • ${item.date}` : ""}
                   </span>
                   <Link
                     href={`/fiction/${item.slug}`}
@@ -145,9 +124,9 @@ export default function FictionPage() {
               </div>
             </article>
           ))}
-          {filteredItems.length === 0 && (
+          {items !== null && filteredItems.length === 0 && (
             <div className="col-span-full py-12 text-center text-black font-medium text-lg">
-              No fiction found in this category.
+              {items.length === 0 ? "No fiction published yet." : "No fiction found in this category."}
             </div>
           )}
         </div>
